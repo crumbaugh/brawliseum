@@ -16,7 +16,7 @@
 
 "use strict";
 var game = new Phaser.Game(800, 600, Phaser.CANVAS, '', { preload: preload, create: create, update: update });
-var player, playerHealth, playerHealthText, sword, enemy, enemyHealth, enemyHealthText, upkey, downkey, leftkey, rightkey, speed, attacking, attackFrame, currAttack, startingRotation, startingPositionDifferenceX, startingPositionDifferenceY, jab1, jab2, jab3, queuedAttack, attackString, queuedString, block, enemyHit;
+var player, playerHealth, playerHealthText, sword, enemy, enemyHealth, enemyHealthText, upkey, downkey, leftkey, rightkey, speed, attacking, attackFrame, currAttack, startingRotationDifference, startingPositionDifferenceX, startingPositionDifferenceY, jab1, jab2, jab3, queuedAttack, attackString, queuedString, block, enemyHit;
 var attacks = new Array(6);
 var returnTime = 8;
 var blockTime = 8;
@@ -39,22 +39,7 @@ class Attack {
 }
 
 function update() {
-    if (leftkey.isDown){
-        player.position.x += -speed;
-        sword.position.x  += -speed;
-    }
-    if (rightkey.isDown){
-        player.position.x += speed;
-        sword.position.x  += speed;
-    }
-    if (upkey.isDown){
-        player.position.y += -speed;
-        sword.position.y  += -speed;
-    }
-    if (downkey.isDown){
-        player.position.y += speed;
-        sword.position.y  += speed;
-    }
+    move();
     if (game.input.mouse.button == 0 && this.formerMouse == -1 && currAttack != -1){ 
 	    if (currAttack == 0) {
             currAttack = jab1;
@@ -91,6 +76,76 @@ function update() {
     checkCollisions();
 }
 
+function move() {
+    if (currAttack == 0) { //attack lock
+        var oldPlayerRotation = player.rotation;    
+        player.rotation   = -game.math.angleBetween(game.input.activePointer.x, game.input.activePointer.y, player.x, player.y); 
+        sword.rotation   += player.rotation - oldPlayerRotation;
+        
+        if (leftkey.isDown){
+            player.position.x += -speed;
+            sword.position.x  += -speed;
+        }
+        if (rightkey.isDown){
+            player.position.x += speed;
+            sword.position.x  += speed;
+        }
+        if (upkey.isDown){
+            player.position.y += -speed;
+            sword.position.y  += -speed;
+        }
+        if (downkey.isDown){
+            player.position.y += speed;
+            sword.position.y  += speed;
+        }
+    } else if (currAttack == -1) { //regain speed during sword return
+        
+        var oldPlayerRotation = player.rotation;    
+        player.rotation += (-game.math.angleBetween(game.input.activePointer.x, game.input.activePointer.y, player.x, player.y)
+                            -oldPlayerRotation)*(.02 + (attackFrame/returnTime)); 
+        sword.rotation  += player.rotation - oldPlayerRotation;
+        
+        if (leftkey.isDown){
+            player.position.x += -speed*(.2+(attackFrame/returnTime));
+            sword.position.x  += -speed*(.2+(attackFrame/returnTime));
+        }
+        if (rightkey.isDown){
+            player.position.x += speed*(.2+(attackFrame/returnTime));
+            sword.position.x  += speed*(.2+(attackFrame/returnTime));
+        }
+        if (upkey.isDown){
+            player.position.y += -speed*(.2+(attackFrame/returnTime));
+            sword.position.y  += -speed*(.2+(attackFrame/returnTime));
+        }
+        if (downkey.isDown){
+            player.position.y += speed*(.2+(attackFrame/returnTime));
+            sword.position.y  += speed*(.2+(attackFrame/returnTime));
+        }    
+    } else { 
+        var oldPlayerRotation = player.rotation;    
+        player.rotation += (-game.math.angleBetween(game.input.activePointer.x, game.input.activePointer.y, player.x, player.y)
+                            -oldPlayerRotation)*.02; 
+        sword.rotation  += player.rotation - oldPlayerRotation;
+        
+        if (leftkey.isDown){
+            player.position.x += -speed*.2;
+            sword.position.x  += -speed*.2;
+        }
+        if (rightkey.isDown){
+            player.position.x += speed*.2;
+            sword.position.x  += speed*.2;
+        }
+        if (upkey.isDown){
+            player.position.y += -speed*.2;
+            sword.position.y  += -speed*.2;
+        }
+        if (downkey.isDown){
+            player.position.y += speed*.2;
+            sword.position.y  += speed*.2;
+        }
+    }
+}
+
 function checkCollisions(){
     if (currAttack > 0 && checkOverlap(sword, enemy) && attacks[currAttack].hitboxes[attackFrame] != 0 && !enemyHit) {
         enemyHit = 1;
@@ -110,13 +165,14 @@ function checkOverlap(spriteA, spriteB) {
 }
 
 function attack() {
-    console.log(attackFrame);
     //return sword
     if (currAttack == -1) {
         if (attackFrame == 0) {
             sword.rotation %= 6.283;
-            sword.rotation = (6.283 - sword.rotation) < sword.rotation ? -(6.283 - sword.rotation) : sword.rotation;
-            startingRotation = sword.rotation;
+            console.log(sword.rotation);
+            console.log(player.rotation);
+            console.log(sword.rotation - player.rotation);
+            startingRotationDifference  = sword.rotation   - player.rotation;
             startingPositionDifferenceX = sword.position.x - player.position.x;
 	        startingPositionDifferenceY = sword.position.y - player.position.y - 10;
         }    
@@ -127,7 +183,7 @@ function attack() {
             enemyHit = 0;
             return;
 	    } else {
-	        sword.rotation   -= startingRotation/returnTime;
+	        sword.rotation   -= startingRotationDifference /returnTime;
 	        sword.position.x -= startingPositionDifferenceX/returnTime;
 	        sword.position.y -= startingPositionDifferenceY/returnTime;
 	    }
@@ -141,10 +197,14 @@ function attack() {
 	        return;
         }
 
-    	sword.position.x += attacks[currAttack].movements[attackFrame][0];
-    	sword.position.y += attacks[currAttack].movements[attackFrame][1];
+        var movementFrameData = attacks[currAttack].movements[attackFrame];
+
+    	sword.position.x += Math.cos(player.rotation)*movementFrameData[0] + Math.sin(player.rotation)*movementFrameData[1];
+    	sword.position.y += Math.sin(player.rotation)*movementFrameData[0] + Math.cos(player.rotation)*movementFrameData[1];
     	sword.rotation   += attacks[currAttack].rotations[attackFrame];
-    } 
+    }
+
+
     attackFrame++;
 }
 
@@ -160,6 +220,8 @@ function create() {
 
     // The player and its settings
     player = game.add.sprite(150, game.world.height - 150, 'dude');
+    player.anchor.setTo(.5,.5);
+    
     enemy  = game.add.sprite(300, game.world.height - 280, 'star');
 
     sword = game.add.sprite(150, game.world.height - 140, 'platform');
@@ -206,7 +268,7 @@ function create() {
 	[0,0,0,0,0,0,0,15,25,40,100,100,40,25,20,15,10]); //hitboxes
 
     attacks[2] = generateAttack(2, 68, [[-20,2,20,1],[60,10,28,1],[5,20,20,0]],[[-1.5,20, 1],[3,28,1],[.2,20,0]],[[0,20],[90,28],[0,20]]);
-    attacks[3] = generateAttack(3, blockTime, [[0,0,blockTime,0]],[[3.14/2,blockTime - 2,1],[0,2,0]],[[0,blockTime - 2],[0,2]]);
+    attacks[3] = generateAttack(3, blockTime, [[-20,-20,blockTime-3,0],[0,0,3,0]],[[3.14/2,blockTime - 2,1],[0,2,0]],[[0,blockTime - 2],[0,2]]);
 }
 
 function generateAttack(num, totalFrames, movements, rotations, hitboxes){
