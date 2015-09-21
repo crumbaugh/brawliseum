@@ -29,10 +29,10 @@ var Attack;
 function createAttack(num, frames, movements, rotations, hitboxes) {
     Attack = {};
     Attack.attackNumber = num;
-    Attack.frames = frames;
-    Attack.movements = movements;
-    Attack.rotations = rotations;
-    Attack.hitboxes = hitboxes;
+    Attack.frames = frames;       //number of frames long the attack is
+    Attack.movements = movements; //2d array of length [frames] where each element is the x and y movements per frame
+    Attack.rotations = rotations; //array of length [frames] where each element is the number of radians it rotates that frame 
+    Attack.hitboxes = hitboxes;   //array of length [frames] where each element is the damage dealt on that frame 
     return Attack;
 }
 
@@ -65,12 +65,16 @@ function update() {
             attackFrame--;
         }
     }
-    this.formerMouse = game.input.mouse.button;
+    
     if (currAttack != 0) {
         attack();
     }
+
     checkCollisions();
+    if (!leftUpdated)
+        leftStick = pos; 
 }
+
 function move() {
     if (currAttack == 0) { //attack lock
         var oldPlayerRotation = player.rotation;    
@@ -150,11 +154,13 @@ function checkCollisions(){
         enemyHealthText.text = 'Enemy health: ' + enemyHealth;
     } 
 }
+
 function checkOverlap(spriteA, spriteB) {
     var boundsA = spriteA.getBounds();
     var boundsB = spriteB.getBounds();
     return Phaser.Rectangle.intersects(boundsA, boundsB);
 }
+
 function attack() {
     //return sword
     if (currAttack == -1) {
@@ -170,13 +176,13 @@ function attack() {
             attackFrame = 0;
             enemyHit = 0;
             return;
-        } else {
+        } else { //actually move the sword
             sword.rotation   -= startingRotationDifference /returnTime;
             sword.position.x -= startingPositionDifferenceX/returnTime;
             sword.position.y -= startingPositionDifferenceY/returnTime;
         }
     } else {
-        if (attackFrame >= attacks[currAttack].frames) {
+        if (attackFrame >= attacks[currAttack].frames) { //end of attack
             queuedAttack = 0;
             attackString = "";
             queuedString = "";
@@ -189,8 +195,10 @@ function attack() {
         sword.position.y += Math.sin(player.rotation)*movementFrameData[0] + Math.cos(player.rotation)*movementFrameData[1];
         sword.rotation   += attacks[currAttack].rotations[attackFrame];
     }
+
     attackFrame++;
 }
+
 var platforms;
 var score = 0;
 var scoreText;
@@ -231,15 +239,19 @@ function create() {
     jab3 = 2;
     block = 3;
     queuedAttack = 0;
+
     attacks[0] = createAttack(0, 0, [0,0],0,0);
+
     attacks[1] = createAttack(1, 17, 
     [[-2,.5],[-3,.5],[-2,.5],[-1,.5],[-.5,0],[-.5,0],[-.5,0], //windup
      [0,0],[1,-.5],[2,-.5],[2,-.5],[3,0],[3,0],[3,0],[3,0],[3,0],[3,0],[3,0],[2,.5],[2,.5],[1,.5],[1,.5],[.5,.5],[0,.5]], //swing 
     [-.05,-.1,-.15,-.2,-.15,-.15,.1,0,.05,.75,.1,.125,.15,.175,.2,.175,.15,.1],//rotations
     [0,0,0,0,0,0,0,15,25,40,100,100,40,25,20,15,10]); //hitboxes
+
     attacks[2] = generateAttack(2, 68, [[-20,2,20,1],[60,10,28,1],[5,20,20,0]],[[-1.5,20, 1],[3,28,1],[.2,20,0]],[[0,20],[90,28],[0,20]]);
     attacks[3] = generateAttack(3, blockTime, [[-20,-20,blockTime-3,0],[0,0,3,0]],[[3.14/2,blockTime - 2,1],[0,2,0]],[[0,blockTime - 2],[0,2]]);
 }
+
 function generateAttack(num, totalFrames, movements, rotations, hitboxes){
     var currFrame = 0;
     var i, j;
