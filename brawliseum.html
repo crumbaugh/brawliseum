@@ -13,9 +13,7 @@
 <body>
 
 <script type="text/javascript">
-"use strict";
 var game = new Phaser.Game(800, 600, Phaser.CANVAS, '', { preload: preload, create: create, update: update });
-var player, playerHealth, playerHealthText, sword, enemy, enemyHealth, enemyHealthText, upkey, downkey, leftkey, rightkey, speed, attacking, attackFrame, currAttack, startingRotationDifference, startingPositionDifferenceX, startingPositionDifferenceY, jab1, jab2, jab3, queuedAttack, attackString, queuedString, block, enemyHit;
 var attacks = new Array(6);
 var returnTime = 8;
 var blockTime = 8;
@@ -25,15 +23,19 @@ function preload() {
     game.load.image('star', 'assets/star.png'); 
     game.load.spritesheet('dude', 'assets/dude.png', 32, 48);
 }
-class Attack {
-    constructor(num, frames, movements, rotations, hitboxes) {
-    this.attackNumber = num;
-    this.frames       = frames;
-    this.movements    = movements;
-    this.rotations    = rotations;
-    this.hitboxes     = hitboxes;
-    }
+
+var Attack;
+
+function createAttack(num, frames, movements, rotations, hitboxes) {
+    Attack = {};
+    Attack.attackNumber = num;
+    Attack.frames = frames;
+    Attack.movements = movements;
+    Attack.rotations = rotations;
+    Attack.hitboxes = hitboxes;
+    return Attack;
 }
+
 function update() {
     move();
     if (game.input.mouse.button == 0 && this.formerMouse == -1 && currAttack != -1){ 
@@ -229,8 +231,8 @@ function create() {
     jab3 = 2;
     block = 3;
     queuedAttack = 0;
-    attacks[0] = new Attack(0, 0, [0,0],0,0);
-    attacks[1] = new Attack(1, 17, 
+    attacks[0] = createAttack(0, 0, [0,0],0,0);
+    attacks[1] = createAttack(1, 17, 
     [[-2,.5],[-3,.5],[-2,.5],[-1,.5],[-.5,0],[-.5,0],[-.5,0], //windup
      [0,0],[1,-.5],[2,-.5],[2,-.5],[3,0],[3,0],[3,0],[3,0],[3,0],[3,0],[3,0],[2,.5],[2,.5],[1,.5],[1,.5],[.5,.5],[0,.5]], //swing 
     [-.05,-.1,-.15,-.2,-.15,-.15,.1,0,.05,.75,.1,.125,.15,.175,.2,.175,.15,.1],//rotations
@@ -281,7 +283,7 @@ function generateAttack(num, totalFrames, movements, rotations, hitboxes){
         }
     }
     
-    return new Attack(num, totalFrames, tempMovements, tempRotations, tempHitboxes);
+    return createAttack(num, totalFrames, tempMovements, tempRotations, tempHitboxes);
 }
 function triangleNumber(n)
 {
