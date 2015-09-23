@@ -39,16 +39,16 @@ function pair(x,y) { this.x = x; this.y = y}
 
 function update() {
     move();
-    if (game.input.mouse.button == 0 && this.formerMouse == -1 &&  player.currAttack != -1){ 
+    if (game.input.mouse.button == 0 && this.formerMouse == -1 && player.currAttack != -1){ 
         if ( player.currAttack == 0) {
             player.currAttack = jab1;
             player.attackString = "jab1";
-        } else if (attackString == "jab1" && player.attacks[ player.currAttack].hitboxes[player.attackFrame] != 0) {
+        } else if (player.attackString == "jab1" && player.attacks[player.currAttack].hitboxes[player.attackFrame] != 0) {
             player.attackFrame = 0;
             player.currAttack = -1;
             player.queuedAttack = jab2;
             player.queuedString = "jab2";
-        } else if (attackString == "jab2" && player.attacks[ player.currAttack].hitboxes[player.attackFrame] != 0) {
+        } else if (player.attackString == "jab2" && player.attacks[player.currAttack].hitboxes[player.attackFrame] != 0) {
             player.attackFrame = 0;
             player.currAttack = -1;
             player.queuedAttack = jab3;
@@ -57,12 +57,12 @@ function update() {
     } else if (game.input.mouse.button == 2 &&  player.currAttack != -1) {
         if ( player.currAttack == 0 && this.formerMouse == -1) {
              player.currAttack = block;
-        } else if (this.formerMouse == -1 && player.attacks[ player.currAttack].hitboxes[player.attackFrame] == 0) {
+        } else if (this.formerMouse == -1 && player.attacks[player.currAttack].hitboxes[player.attackFrame] == 0) {
             player.attackFrame = 0;
             player.currAttack = -1;
             player.queuedAttack = block;
             player.queuedString = "block";
-        } else if ( player.currAttack == block && player.attackFrame == blockTime - 1) {
+        } else if (player.currAttack == block && player.attackFrame == blockTime - 1) {
             player.attackFrame--;
         }
     }
@@ -82,79 +82,84 @@ function update() {
 }
 
 function move() {
-    if ( player.currAttack == 0) { //attack lock
-        var oldPlayerRotation = player.rotation;    
-        player.rotation   = -game.math.angleBetween(game.input.activePointer.x, game.input.activePointer.y, player.x, player.y); 
-        player.sword.rotation   += player.rotation - oldPlayerRotation;
-        
+    if (player.currAttack == 0) { //attack lock
+        oldPlayerRotation = player.rotation;    
+        player.rotation = -game.math.angleBetween(game.input.activePointer.x, game.input.activePointer.y, player.x, player.y); 
+        //player.sword.rotation   += player.rotation - oldPlayerRotation;
+
         if (leftkey.isDown){
             player.position.x += -speed;
-            player.sword.position.x  += -speed;
+            player.sword.position.x += -speed;
         }
         if (rightkey.isDown){
             player.position.x += speed;
-            player.sword.position.x  += speed;
+            player.sword.position.x += speed;
         }
         if (upkey.isDown){
             player.position.y += -speed;
-            player.sword.position.y  += -speed;
+            player.sword.position.y += -speed;
         }
         if (downkey.isDown){
             player.position.y += speed;
-            player.sword.position.y  += speed;
+            player.sword.position.y += speed;
         }
-    } else if ( player.currAttack == -1) { //regain speed during player.sword.return
+    } else if (player.currAttack == -1) { //regain speed during player.sword.return
         
         var oldPlayerRotation = player.rotation;    
         player.rotation += (-game.math.angleBetween(game.input.activePointer.x, game.input.activePointer.y, player.x, player.y)
                             -oldPlayerRotation)*(.02 + (player.attackFrame/returnTime)); 
-        player.sword.rotation  += player.rotation - oldPlayerRotation;
+        player.sword.rotation += player.rotation - oldPlayerRotation;
         
         if (leftkey.isDown){
             player.position.x += -speed*(.2+(player.attackFrame/returnTime));
-            player.sword.position.x  += -speed*(.2+(player.attackFrame/returnTime));
+            player.sword.position.x += -speed*(.2+(player.attackFrame/returnTime));
         }
         if (rightkey.isDown){
             player.position.x += speed*(.2+(player.attackFrame/returnTime));
-            player.sword.position.x  += speed*(.2+(player.attackFrame/returnTime));
+            player.sword.position.x += speed*(.2+(player.attackFrame/returnTime));
         }
         if (upkey.isDown){
             player.position.y += -speed*(.2+(player.attackFrame/returnTime));
-            player.sword.position.y  += -speed*(.2+(player.attackFrame/returnTime));
+            player.sword.position.y += -speed*(.2+(player.attackFrame/returnTime));
         }
         if (downkey.isDown){
             player.position.y += speed*(.2+(player.attackFrame/returnTime));
-            player.sword.position.y  += speed*(.2+(player.attackFrame/returnTime));
+            player.sword.position.y += speed*(.2+(player.attackFrame/returnTime));
         }    
     } else { 
         var oldPlayerRotation = player.rotation;    
         player.rotation += (-game.math.angleBetween(game.input.activePointer.x, game.input.activePointer.y, player.x, player.y)
                             -oldPlayerRotation)*.02; 
-        player.sword.rotation  += player.rotation - oldPlayerRotation;
+        player.sword.rotation += player.rotation - oldPlayerRotation;
         
         if (leftkey.isDown){
             player.position.x += -speed*.2;
-            player.sword.position.x  += -speed*.2;
+            player.sword.position.x += -speed*.2;
         }
         if (rightkey.isDown){
             player.position.x += speed*.2;
-            player.sword.position.x  += speed*.2;
+            player.sword.position.x += speed*.2;
         }
         if (upkey.isDown){
             player.position.y += -speed*.2;
-            player.sword.position.y  += -speed*.2;
+            player.sword.position.y += -speed*.2;
         }
         if (downkey.isDown){
             player.position.y += speed*.2;
-            player.sword.position.y  += speed*.2;
+            player.sword.position.y += speed*.2;
         }
     }
+    //point sword forward
+    player.sword.position.x -= (Math.sin(oldPlayerRotation) - Math.sin(player.rotation)) * minDistance; 
+    player.sword.position.y += (Math.cos(oldPlayerRotation) - Math.cos(player.rotation)) * minDistance;  
+    player.sword.rotation = -game.math.angleBetween(player.sword.x, player.sword.y, player.x, player.y);  
+    enemy.sword.rotation = -game.math.angleBetween(enemy.sword.x, enemy.sword.y, enemy.x, enemy.y);  
 }
 
 function checkCollisions(){
-    if ((player.currAttack > 0 || enemy.currAttack > 0)  //if someone is attacking 
+    if ((player.currAttack > 0 || enemy.currAttack > 0) //if someone is attacking 
          && player.currAttack != 6 && enemy.currAttack != 6 && player.currAttack != -1 && enemy.currAttack != -1 //and neither is already in knockback
-         && checkOverlap(player.sword, enemy.sword)) {        //and the swords are touching
+         && checkOverlap(player.sword, enemy.sword)) { //and the swords are touching
             collide(player.sword, enemy.sword);    
     }
     if (player.currAttack > 0 && checkOverlap(player.sword, enemy) && player.attacks[player.currAttack].hitboxes[player.attackFrame] != 0 && !enemy.hit) {
@@ -193,10 +198,10 @@ function attack(thisPlayer) {
     //return sword
     if (thisPlayer.currAttack == -1) {
         if (thisPlayer.attackFrame == 0) {
-            thisPlayer.sword.rotation %= 6.283;
-            startingRotationDifference  = thisPlayer.sword.rotation   - thisPlayer.rotation;
-            startingPositionDifferenceX = thisPlayer.sword.position.x - thisPlayer.position.x;
-            startingPositionDifferenceY = thisPlayer.sword.position.y - thisPlayer.position.y - 10;
+            //thisPlayer.sword.rotation %= 6.283;
+            //startingRotationDifference  = thisPlayer.sword.rotation   - thisPlayer.rotation;
+            startingPositionDifferenceX = (thisPlayer.position.x + Math.sin(thisPlayer.rotation)*minDistance) - thisPlayer.sword.position.x;
+            startingPositionDifferenceY = (thisPlayer.position.y - Math.cos(thisPlayer.rotation)*minDistance) - thisPlayer.sword.position.y;
         }    
         if (thisPlayer.attackFrame == returnTime) {
             thisPlayer.currAttack = thisPlayer.queuedAttack;
@@ -205,9 +210,9 @@ function attack(thisPlayer) {
             enemy.hit = 0;
             return;
         } else { //actually move the sword
-            thisPlayer.sword.rotation   -= startingRotationDifference /returnTime;
-            thisPlayer.sword.position.x -= startingPositionDifferenceX/returnTime;
-            thisPlayer.sword.position.y -= startingPositionDifferenceY/returnTime;
+            //thisPlayer.sword.rotation   -= startingRotationDifference /returnTime;
+            thisPlayer.sword.position.x += startingPositionDifferenceX/returnTime;
+            thisPlayer.sword.position.y += startingPositionDifferenceY/returnTime;
         }
     } else {
         if (thisPlayer.attackFrame >= thisPlayer.attacks[thisPlayer.currAttack].frames) { //end of attack
@@ -222,10 +227,12 @@ function attack(thisPlayer) {
         thisPlayer.sword.position.x += Math.cos(thisPlayer.rotation)*movementFrameData[0] + Math.sin(thisPlayer.rotation)*movementFrameData[1];
         thisPlayer.sword.position.y += Math.sin(thisPlayer.rotation)*movementFrameData[0] + Math.cos(thisPlayer.rotation)*movementFrameData[1];
         //thisPlayer.sword.rotation   += thisPlayer.attacks[ thisPlayer.currAttack].rotations[thisPlayer.attackFrame];
-    
-        if (Math.sqrt(Math.pow(thisPlayer.sword.position.x - thisPlayer.position.x, 2) + Math.pow(thisPlayer.sword.position.y - thisPlayer.position.y, 2)) > 10) {
-            thisPlayer.sword.position.x *= thisPlayer.sword.position.x/10;   
         
+        var distance = Math.sqrt(Math.pow(thisPlayer.sword.position.x - thisPlayer.position.x, 2) 
+                               + Math.pow(thisPlayer.sword.position.y - thisPlayer.position.y, 2));
+        if (distance > maxDistance) { //if the sword is too far away from its owner, move it to the max distance
+            thisPlayer.sword.position.x = thisPlayer.position.x + ((thisPlayer.sword.position.x - thisPlayer.position.x) / distance * maxDistance);   
+            thisPlayer.sword.position.y = thisPlayer.position.y + ((thisPlayer.sword.position.y - thisPlayer.position.y) / distance * maxDistance); 
         }
     }
     thisPlayer.attackFrame++;
@@ -242,7 +249,7 @@ function create() {
     
     player = game.add.sprite(150, game.world.height - 150, 'dude');
     player.anchor.setTo(.5,.5);
-    player.sword = game.add.sprite(150, game.world.height - 140, 'platform');
+    player.sword = game.add.sprite(150, game.world.height - 160, 'platform');
     player.sword.scale.setTo(.4,1.6);
     player.sword.anchor.setTo(0.5, 0.9);
     player.sword.previousPosition = new pair(player.sword.position.x, player.sword.position.y);  
@@ -256,9 +263,11 @@ function create() {
     enemy.sword.previousPosition = new pair(enemy.sword.position.x, enemy.sword.position.y);  
     enemy.sword.weight = 10;
 
-    //set player speed 
+    //set some various constants 
     speed = 3;
-    
+    maxDistance = 20;
+    minDistance = 10;
+
     upkey = game.input.keyboard.addKey(Phaser.Keyboard.W);
     downkey = game.input.keyboard.addKey(Phaser.Keyboard.S);
     leftkey = game.input.keyboard.addKey(Phaser.Keyboard.A);
