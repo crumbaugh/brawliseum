@@ -14,7 +14,6 @@
 
 <script type="text/javascript">
 var game = new Phaser.Game(800, 600, Phaser.CANVAS, '', { preload: preload, create: create, update: update });
-var attacks = new Array(6);
 var returnTime = 8;
 var blockTime = 8;
 function preload() {
@@ -36,123 +35,152 @@ function createAttack(num, frames, movements, rotations, hitboxes) {
     return Attack;
 }
 
+function pair(x,y) { this.x = x; this.y = y}
+
 function update() {
     move();
-    if (game.input.mouse.button == 0 && this.formerMouse == -1 && currAttack != -1){ 
-        if (currAttack == 0) {
-            currAttack = jab1;
-            attackString = "jab1";
-        } else if (attackString == "jab1" && attacks[currAttack].hitboxes[attackFrame] != 0) {
-            attackFrame = 0;
-            currAttack = -1;
-            queuedAttack = jab2;
-            queuedString = "jab2";
-        } else if (attackString == "jab2" && attacks[currAttack].hitboxes[attackFrame] != 0) {
-            attackFrame = 0;
-            currAttack = -1;
-            queuedAttack = jab3;
-            queuedString = "jab3";
+    if (game.input.mouse.button == 0 && this.formerMouse == -1 &&  player.currAttack != -1){ 
+        if ( player.currAttack == 0) {
+            player.currAttack = jab1;
+            player.attackString = "jab1";
+        } else if (attackString == "jab1" && player.attacks[ player.currAttack].hitboxes[player.attackFrame] != 0) {
+            player.attackFrame = 0;
+            player.currAttack = -1;
+            player.queuedAttack = jab2;
+            player.queuedString = "jab2";
+        } else if (attackString == "jab2" && player.attacks[ player.currAttack].hitboxes[player.attackFrame] != 0) {
+            player.attackFrame = 0;
+            player.currAttack = -1;
+            player.queuedAttack = jab3;
+            player.queuedString = "jab3";
         }
-    } else if (game.input.mouse.button == 2 && currAttack != -1) {
-        if (currAttack == 0 && this.formerMouse == -1) {
-            currAttack = block;
-        } else if (this.formerMouse == -1 && attacks[currAttack].hitboxes[attackFrame] == 0) {
-            attackFrame = 0;
-            currAttack = -1;
-            queuedAttack = block;
-            queuedString = "block";
-        } else if (currAttack == block && attackFrame == blockTime - 1) {
-            attackFrame--;
+    } else if (game.input.mouse.button == 2 &&  player.currAttack != -1) {
+        if ( player.currAttack == 0 && this.formerMouse == -1) {
+             player.currAttack = block;
+        } else if (this.formerMouse == -1 && player.attacks[ player.currAttack].hitboxes[player.attackFrame] == 0) {
+            player.attackFrame = 0;
+            player.currAttack = -1;
+            player.queuedAttack = block;
+            player.queuedString = "block";
+        } else if ( player.currAttack == block && player.attackFrame == blockTime - 1) {
+            player.attackFrame--;
         }
     }
     
-    if (currAttack != 0) {
-        attack();
-    }
+    if (player.currAttack != 0)
+        attack(player);
+    if (enemy.currAttack  != 0)
+        attack(enemy);
 
     checkCollisions();
-    if (!leftUpdated)
-        leftStick = pos; 
+    
+    this.formerMouse = game.input.mouse.button;
+    player.sword.previousPosition.x = player.sword.position.x;
+    player.sword.previousPosition.y = player.sword.position.y;
+    enemy.sword.previousPosition.x  = enemy.sword.position.x; 
+    enemy.sword.previousPosition.y  = enemy.sword.position.y; 
 }
 
 function move() {
-    if (currAttack == 0) { //attack lock
+    if ( player.currAttack == 0) { //attack lock
         var oldPlayerRotation = player.rotation;    
         player.rotation   = -game.math.angleBetween(game.input.activePointer.x, game.input.activePointer.y, player.x, player.y); 
-        sword.rotation   += player.rotation - oldPlayerRotation;
+        player.sword.rotation   += player.rotation - oldPlayerRotation;
         
         if (leftkey.isDown){
             player.position.x += -speed;
-            sword.position.x  += -speed;
+            player.sword.position.x  += -speed;
         }
         if (rightkey.isDown){
             player.position.x += speed;
-            sword.position.x  += speed;
+            player.sword.position.x  += speed;
         }
         if (upkey.isDown){
             player.position.y += -speed;
-            sword.position.y  += -speed;
+            player.sword.position.y  += -speed;
         }
         if (downkey.isDown){
             player.position.y += speed;
-            sword.position.y  += speed;
+            player.sword.position.y  += speed;
         }
-    } else if (currAttack == -1) { //regain speed during sword return
+    } else if ( player.currAttack == -1) { //regain speed during player.sword.return
         
         var oldPlayerRotation = player.rotation;    
         player.rotation += (-game.math.angleBetween(game.input.activePointer.x, game.input.activePointer.y, player.x, player.y)
-                            -oldPlayerRotation)*(.02 + (attackFrame/returnTime)); 
-        sword.rotation  += player.rotation - oldPlayerRotation;
+                            -oldPlayerRotation)*(.02 + (player.attackFrame/returnTime)); 
+        player.sword.rotation  += player.rotation - oldPlayerRotation;
         
         if (leftkey.isDown){
-            player.position.x += -speed*(.2+(attackFrame/returnTime));
-            sword.position.x  += -speed*(.2+(attackFrame/returnTime));
+            player.position.x += -speed*(.2+(player.attackFrame/returnTime));
+            player.sword.position.x  += -speed*(.2+(player.attackFrame/returnTime));
         }
         if (rightkey.isDown){
-            player.position.x += speed*(.2+(attackFrame/returnTime));
-            sword.position.x  += speed*(.2+(attackFrame/returnTime));
+            player.position.x += speed*(.2+(player.attackFrame/returnTime));
+            player.sword.position.x  += speed*(.2+(player.attackFrame/returnTime));
         }
         if (upkey.isDown){
-            player.position.y += -speed*(.2+(attackFrame/returnTime));
-            sword.position.y  += -speed*(.2+(attackFrame/returnTime));
+            player.position.y += -speed*(.2+(player.attackFrame/returnTime));
+            player.sword.position.y  += -speed*(.2+(player.attackFrame/returnTime));
         }
         if (downkey.isDown){
-            player.position.y += speed*(.2+(attackFrame/returnTime));
-            sword.position.y  += speed*(.2+(attackFrame/returnTime));
+            player.position.y += speed*(.2+(player.attackFrame/returnTime));
+            player.sword.position.y  += speed*(.2+(player.attackFrame/returnTime));
         }    
     } else { 
         var oldPlayerRotation = player.rotation;    
         player.rotation += (-game.math.angleBetween(game.input.activePointer.x, game.input.activePointer.y, player.x, player.y)
                             -oldPlayerRotation)*.02; 
-        sword.rotation  += player.rotation - oldPlayerRotation;
+        player.sword.rotation  += player.rotation - oldPlayerRotation;
         
         if (leftkey.isDown){
             player.position.x += -speed*.2;
-            sword.position.x  += -speed*.2;
+            player.sword.position.x  += -speed*.2;
         }
         if (rightkey.isDown){
             player.position.x += speed*.2;
-            sword.position.x  += speed*.2;
+            player.sword.position.x  += speed*.2;
         }
         if (upkey.isDown){
             player.position.y += -speed*.2;
-            sword.position.y  += -speed*.2;
+            player.sword.position.y  += -speed*.2;
         }
         if (downkey.isDown){
             player.position.y += speed*.2;
-            sword.position.y  += speed*.2;
+            player.sword.position.y  += speed*.2;
         }
     }
 }
+
 function checkCollisions(){
-    if (currAttack > 0 && checkOverlap(sword, enemy) && attacks[currAttack].hitboxes[attackFrame] != 0 && !enemyHit) {
-        enemyHit = 1;
+    if ((player.currAttack > 0 || enemy.currAttack > 0)  //if someone is attacking 
+         && player.currAttack != 6 && enemy.currAttack != 6 && player.currAttack != -1 && enemy.currAttack != -1 //and neither is already in knockback
+         && checkOverlap(player.sword, enemy.sword)) {        //and the swords are touching
+            collide(player.sword, enemy.sword);    
+    }
+    if (player.currAttack > 0 && checkOverlap(player.sword, enemy) && player.attacks[player.currAttack].hitboxes[player.attackFrame] != 0 && !enemy.hit) {
+        enemy.hit = 1;
         var damage = game.add.text(enemy.position.x + 30*(Math.random()-.5), enemy.position.y + 30*(Math.random()-.5),
-                                   attacks[currAttack].hitboxes[attackFrame]);
+                                   player.attacks[player.currAttack].hitboxes[player.attackFrame]);
         game.add.tween(damage).to({alpha: 0}, 1000, Phaser.Easing.Linear.None, true);
-        enemyHealth -= attacks[currAttack].hitboxes[attackFrame];
-        enemyHealthText.text = 'Enemy health: ' + enemyHealth;
+        enemy.health -= player.attacks[player.currAttack].hitboxes[player.attackFrame];
+        enemy.healthText.text = 'Enemy health: ' + enemy.health;
     } 
+}
+
+function collide(sword1, sword2) {
+    var velocity1 = {}; //new sword1 velocity
+    var velocity2 = {}; //new sword2 velocity
+    velocity1.x = (sword1.position.x - sword1.previousPosition.x) + (sword2.position.x - sword2.previousPosition.x);
+    velocity1.y = (sword1.position.y - sword1.previousPosition.y) + (sword2.position.y - sword2.previousPosition.y);
+    velocity2.x = (sword2.position.x - sword2.previousPosition.x) + (sword1.position.x - sword1.previousPosition.x);
+    velocity2.y = (sword2.position.y - sword2.previousPosition.y) + (sword1.position.y - sword1.previousPosition.y);
+
+    var frames = Math.sqrt(velocity2.x * velocity2.x + velocity2.y * velocity2.y) * sword2.weight; //magnitude of velocity vector * weight
+    frames = Math.floor(frames);
+    enemy.attacks[6] = generateAttack(6, frames, [[velocity2.x * 50, velocity2.y * 50, frames, 2]], [[0,frames,0]], [[0,frames]]);  
+
+    enemy.currAttack  = 6;
+    enemy.attackFrame = 0;
 }
 
 function checkOverlap(spriteA, spriteB) {
@@ -161,42 +189,42 @@ function checkOverlap(spriteA, spriteB) {
     return Phaser.Rectangle.intersects(boundsA, boundsB);
 }
 
-function attack() {
+function attack(thisPlayer) {
     //return sword
-    if (currAttack == -1) {
-        if (attackFrame == 0) {
-            sword.rotation %= 6.283;
-            startingRotationDifference  = sword.rotation   - player.rotation;
-            startingPositionDifferenceX = sword.position.x - player.position.x;
-            startingPositionDifferenceY = sword.position.y - player.position.y - 10;
+    if (thisPlayer.currAttack == -1) {
+        if (thisPlayer.attackFrame == 0) {
+            thisPlayer.sword.rotation %= 6.283;
+            startingRotationDifference  = thisPlayer.sword.rotation   - thisPlayer.rotation;
+            startingPositionDifferenceX = thisPlayer.sword.position.x - thisPlayer.position.x;
+            startingPositionDifferenceY = thisPlayer.sword.position.y - thisPlayer.position.y - 10;
         }    
-        if (attackFrame == returnTime) {
-            currAttack = queuedAttack;
-            attackString = queuedString;
-            attackFrame = 0;
-            enemyHit = 0;
+        if (thisPlayer.attackFrame == returnTime) {
+            thisPlayer.currAttack = thisPlayer.queuedAttack;
+            thisPlayer.attackString = thisPlayer.queuedString;
+            thisPlayer.attackFrame = 0;
+            enemy.hit = 0;
             return;
         } else { //actually move the sword
-            sword.rotation   -= startingRotationDifference /returnTime;
-            sword.position.x -= startingPositionDifferenceX/returnTime;
-            sword.position.y -= startingPositionDifferenceY/returnTime;
+            thisPlayer.sword.rotation   -= startingRotationDifference /returnTime;
+            thisPlayer.sword.position.x -= startingPositionDifferenceX/returnTime;
+            thisPlayer.sword.position.y -= startingPositionDifferenceY/returnTime;
         }
     } else {
-        if (attackFrame >= attacks[currAttack].frames) { //end of attack
-            queuedAttack = 0;
-            attackString = "";
-            queuedString = "";
-            attackFrame = 0;
-            currAttack = -1;
+        if (thisPlayer.attackFrame >= thisPlayer.attacks[thisPlayer.currAttack].frames) { //end of attack
+            thisPlayer.queuedAttack = 0;
+            thisPlayer.attackString = "";
+            thisPlayer.queuedString = "";
+            thisPlayer.attackFrame = 0;
+            thisPlayer.currAttack = -1;
             return;
         }
-        var movementFrameData = attacks[currAttack].movements[attackFrame];
-        sword.position.x += Math.cos(player.rotation)*movementFrameData[0] + Math.sin(player.rotation)*movementFrameData[1];
-        sword.position.y += Math.sin(player.rotation)*movementFrameData[0] + Math.cos(player.rotation)*movementFrameData[1];
-        sword.rotation   += attacks[currAttack].rotations[attackFrame];
+        var movementFrameData = thisPlayer.attacks[thisPlayer.currAttack].movements[thisPlayer.attackFrame];
+        thisPlayer.sword.position.x += Math.cos(thisPlayer.rotation)*movementFrameData[0] + Math.sin(thisPlayer.rotation)*movementFrameData[1];
+        thisPlayer.sword.position.y += Math.sin(thisPlayer.rotation)*movementFrameData[0] + Math.cos(thisPlayer.rotation)*movementFrameData[1];
+        thisPlayer.sword.rotation   += thisPlayer.attacks[ thisPlayer.currAttack].rotations[thisPlayer.attackFrame];
     }
 
-    attackFrame++;
+    thisPlayer.attackFrame++;
 }
 
 var platforms;
@@ -210,46 +238,61 @@ function create() {
     player = game.add.sprite(150, game.world.height - 150, 'dude');
     player.anchor.setTo(.5,.5);
     
-    enemy  = game.add.sprite(300, game.world.height - 280, 'star');
-    sword = game.add.sprite(150, game.world.height - 140, 'platform');
-    sword.scale.setTo(.4,1.6);
-    sword.anchor.setTo(0.5, 0.9);   
+    enemy = game.add.sprite(300, game.world.height - 280, 'star');
+    
+    player.sword = game.add.sprite(150, game.world.height - 140, 'platform');
+    player.sword.scale.setTo(.4,1.6);
+    player.sword.anchor.setTo(0.5, 0.9);
+    player.sword.previousPosition = new pair(player.sword.position.x, player.sword.position.y);  
+    player.sword.weight = 10;
+
+    enemy.sword = game.add.sprite(150, game.world.height - 290, 'platform');
+    enemy.sword.scale.setTo(.4,1.6);
+    enemy.sword.anchor.setTo(0.5, 0.9);   
+    enemy.sword.previousPosition = new pair(enemy.sword.position.x, enemy.sword.position.y);  
+    enemy.sword.weight = 10;
+
     //set player speed 
     speed = 3;
-    //  We need to enable physics on the player
-    //game.physics.arcade.enable(player);
-    //game.physics.arcade.enable(sword);
-    //  Player physics properties. Give the little guy a slight bounce.
-    //player.body.collideWorldBounds = true;
+    
     upkey = game.input.keyboard.addKey(Phaser.Keyboard.W);
     downkey = game.input.keyboard.addKey(Phaser.Keyboard.S);
     leftkey = game.input.keyboard.addKey(Phaser.Keyboard.A);
     rightkey = game.input.keyboard.addKey(Phaser.Keyboard.D);
+    
     this.formerMouse = -1;
-    attacking = false;
-    currAttack = 0;
-    attackFrame = 0;
-    enemyHit = 0;
-    enemyHealth  = 1000;
-    enemyHealthText  = game.add.text(game.world.width - 300, 50, 'Enemy health: ' + enemyHealth, { fill: '#ffffff' });
-    playerHealth = 1000;
-    playerHealthText = game.add.text(50, 50, 'Player health: ' + playerHealth, { fill: '#ffffff' });
-    jab1 = 2;
-    jab2 = 1;
-    jab3 = 2;
+    
+    player.currAttack = 0;
+    player.attackFrame = 0;
+    player.hit = 0;
+    player.queuedAttack = 0;
+    player.attacks = new Array(10);
+    player.health = 1000;
+    player.healthText = game.add.text(50, 50, 'Player health: ' + player.health, { fill: '#ffffff' });
+    
+    enemy.currAttack = 0;
+    enemy.attackFrame = 0;
+    enemy.hit = 0;
+    enemy.queuedAttack = 0;
+    enemy.attacks = new Array(10); 
+    enemy.health  = 1000;
+    enemy.healthText = game.add.text(game.world.width - 300, 50, 'Enemy health: ' + enemy.health, { fill: '#ffffff' });
+     
+    jab1  = 2;
+    jab2  = 1;
+    jab3  = 2;
     block = 3;
-    queuedAttack = 0;
 
-    attacks[0] = createAttack(0, 0, [0,0],0,0);
+    player.attacks[0] = createAttack(0, 0, [0,0],0,0);
 
-    attacks[1] = createAttack(1, 17, 
+    player.attacks[1] = createAttack(1, 17, 
     [[-2,.5],[-3,.5],[-2,.5],[-1,.5],[-.5,0],[-.5,0],[-.5,0], //windup
      [0,0],[1,-.5],[2,-.5],[2,-.5],[3,0],[3,0],[3,0],[3,0],[3,0],[3,0],[3,0],[2,.5],[2,.5],[1,.5],[1,.5],[.5,.5],[0,.5]], //swing 
     [-.05,-.1,-.15,-.2,-.15,-.15,.1,0,.05,.75,.1,.125,.15,.175,.2,.175,.15,.1],//rotations
     [0,0,0,0,0,0,0,15,25,40,100,100,40,25,20,15,10]); //hitboxes
 
-    attacks[2] = generateAttack(2, 68, [[-20,2,20,1],[60,10,28,1],[5,20,20,0]],[[-1.5,20, 1],[3,28,1],[.2,20,0]],[[0,20],[90,28],[0,20]]);
-    attacks[3] = generateAttack(3, blockTime, [[-20,-20,blockTime-3,0],[0,0,3,0]],[[3.14/2,blockTime - 2,1],[0,2,0]],[[0,blockTime - 2],[0,2]]);
+    player.attacks[2] = generateAttack(2, 68, [[-20,2,20,1],[60,10,28,2],[5,20,20,0]],[[-1.5,20, 1],[3,28,1],[.2,20,0]],[[0,20],[90,28],[0,20]]);
+    player.attacks[3] = generateAttack(3, blockTime, [[-20,-20,blockTime-3,0],[0,0,3,0]],[[3.14/2,blockTime - 2,1],[0,2,0]],[[0,blockTime - 2],[0,2]]);
 }
 
 function generateAttack(num, totalFrames, movements, rotations, hitboxes){
@@ -262,14 +305,17 @@ function generateAttack(num, totalFrames, movements, rotations, hitboxes){
         var frames = movements[i][2];
         for (j = 1; j <= frames; j++) {
             tempMovements[currFrame] = new Array(2);
-            if (movements[i][3]) { //accelerated
+            if (movements[i][3] == 1) { //accelerated
                 var factor = j < frames - j + 1 ? j : frames - j + 1;
                 tempMovements[currFrame][0] = (factor)*(movements[i][0] / (2*triangleNumber(frames/2)));
                 tempMovements[currFrame][1] = (factor)*(movements[i][1] / (2*triangleNumber(frames/2)));
-            } else { 
+            } else if (movements[i][3] == 0) { //standard 
                 tempMovements[currFrame][0] = movements[i][0] / frames;
                 tempMovements[currFrame][1] = movements[i][1] / frames;
-            }    
+            } else if (movements[i][3] == 2) { //decelerated 
+                tempMovements[currFrame][0] = (frames - j + 1)*(movements[i][0] / (triangleNumber(frames)));
+                tempMovements[currFrame][1] = (frames - j + 1)*(movements[i][1] / (triangleNumber(frames)));
+            }
             currFrame++;
         }
     }
