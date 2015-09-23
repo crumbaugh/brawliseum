@@ -221,9 +221,13 @@ function attack(thisPlayer) {
         var movementFrameData = thisPlayer.attacks[thisPlayer.currAttack].movements[thisPlayer.attackFrame];
         thisPlayer.sword.position.x += Math.cos(thisPlayer.rotation)*movementFrameData[0] + Math.sin(thisPlayer.rotation)*movementFrameData[1];
         thisPlayer.sword.position.y += Math.sin(thisPlayer.rotation)*movementFrameData[0] + Math.cos(thisPlayer.rotation)*movementFrameData[1];
-        thisPlayer.sword.rotation   += thisPlayer.attacks[ thisPlayer.currAttack].rotations[thisPlayer.attackFrame];
+        //thisPlayer.sword.rotation   += thisPlayer.attacks[ thisPlayer.currAttack].rotations[thisPlayer.attackFrame];
+    
+        if (Math.sqrt(Math.pow(thisPlayer.sword.position.x - thisPlayer.position.x, 2) + Math.pow(thisPlayer.sword.position.y - thisPlayer.position.y, 2)) > 10) {
+            thisPlayer.sword.position.x *= thisPlayer.sword.position.x/10;   
+        
+        }
     }
-
     thisPlayer.attackFrame++;
 }
 
@@ -235,18 +239,18 @@ function create() {
     //  A simple background for our game
     game.add.sprite(0, 0, 'sky');
     // The player and its settings
+    
     player = game.add.sprite(150, game.world.height - 150, 'dude');
     player.anchor.setTo(.5,.5);
-    
-    enemy = game.add.sprite(300, game.world.height - 280, 'star');
-    
     player.sword = game.add.sprite(150, game.world.height - 140, 'platform');
     player.sword.scale.setTo(.4,1.6);
     player.sword.anchor.setTo(0.5, 0.9);
     player.sword.previousPosition = new pair(player.sword.position.x, player.sword.position.y);  
     player.sword.weight = 10;
 
-    enemy.sword = game.add.sprite(150, game.world.height - 290, 'platform');
+    enemy = game.add.sprite(300, game.world.height - 290, 'star');
+    enemy.anchor.setTo(.5,.5);
+    enemy.sword = game.add.sprite(300, game.world.height - 280, 'platform');
     enemy.sword.scale.setTo(.4,1.6);
     enemy.sword.anchor.setTo(0.5, 0.9);   
     enemy.sword.previousPosition = new pair(enemy.sword.position.x, enemy.sword.position.y);  
