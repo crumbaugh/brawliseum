@@ -1,4 +1,22 @@
-var game = new Phaser.Game(800, 600, Phaser.CANVAS, '', { preload: preload, create: create, update: update });
+var ready = false;
+var eurecaServer;
+//this function will handle client communication with the server
+var eurecaClientSetup = function() {
+    //create an instance of eureca.io client
+    var eurecaClient = new Eureca.Client();
+    
+    eurecaClient.ready(function (proxy) {       
+        eurecaServer = proxy;
+        
+        
+        //we temporary put create function here so we make sure to launch the game once the client is ready
+        create();
+        ready = true;
+    }); 
+}
+
+var game = new Phaser.Game(800, 600, Phaser.CANVAS, 'phaser-example', { preload: preload, create: eurecaClientSetup, update: update });
+
 var returnTime = 8;
 var blockTime = 8;
 function preload() {
@@ -23,6 +41,8 @@ function createAttack(num, frames, movements, rotations, hitboxes) {
 function pair(x,y) { this.x = x; this.y = y}
 
 function update() {
+if (!ready) return;
+
     move();
     if (game.input.mouse.button == 0 && this.formerMouse == -1 && player.currAttack != -1){ 
         if ( player.currAttack == 0) {
