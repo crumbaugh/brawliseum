@@ -1,5 +1,6 @@
 var ready = false;
 var eurecaServer;
+var myId;
 //this function will handle client communication with the server
 var eurecaClientSetup = function() {
     //create an instance of eureca.io client
@@ -7,12 +8,41 @@ var eurecaClientSetup = function() {
     
     eurecaClient.ready(function (proxy) {       
         eurecaServer = proxy;
-        
+    }); 
+
         
         //we temporary put create function here so we make sure to launch the game once the client is ready
+    eurecaClient.exports.setId = function(id) 
+    {
+        //create() is moved here to make sure nothing is created before uniq id assignation
+        myId = id;
         create();
+        eurecaServer.handshake();
         ready = true;
-    }); 
+    }   
+
+    eurecaServer.exports.handshake = function()
+    {
+        //var conn = this.connection;
+        for (var c in clients)
+        {
+            var remote = clients[c].remote;
+            for (var cc in clients)
+            {       
+                remote.spawnEnemy(clients[cc].id, 0, 0);        
+            }
+        }
+    }
+
+    eurecaClient.exports.spawnEnemy = function(i, x, y)
+    {
+        
+        if (i == myId) return; //this is me
+        
+        console.log('SPAWN');
+        var tnk = new Player(i, game);
+        tanksList[i] = tnk;
+    }
 }
 
 var game = new Phaser.Game(800, 600, Phaser.CANVAS, 'phaser-example', { preload: preload, create: eurecaClientSetup, update: update });
@@ -246,27 +276,17 @@ function attack(thisPlayer) {
 var platforms;
 var score = 0;
 var scoreText;
-function create() {
-    game.canvas.oncontextmenu = function (e) { e.preventDefault(); }
-    //  A simple background for our game
-    game.add.sprite(0, 0, 'sky');
-    // The player and its settings
-    
-    player = game.add.sprite(150, game.world.height - 150, 'dude');
-    player.anchor.setTo(.5,.5);
-    player.sword = game.add.sprite(150, game.world.height - 160, 'platform');
-    player.sword.scale.setTo(.4,1.6);
-    player.sword.anchor.setTo(0.5, 0.9);
-    player.sword.previousPosition = new pair(player.sword.position.x, player.sword.position.y);  
-    player.sword.weight = 10;
 
-    enemy = game.add.sprite(300, game.world.height - 290, 'star');
-    enemy.anchor.setTo(.5,.5);
-    enemy.sword = game.add.sprite(300, game.world.height - 280, 'platform');
-    enemy.sword.scale.setTo(.4,1.6);
-    enemy.sword.anchor.setTo(0.5, 0.9);   
-    enemy.sword.previousPosition = new pair(enemy.sword.position.x, enemy.sword.position.y);  
-    enemy.sword.weight = 10;
+Player = function(myId, game) {
+    this.game = game;
+    this.id = myId;
+    this.player = game.add.sprite(150, game.world.height - 150, 'dude');
+    this.anchor.setTo(.5,.5);
+    this.sword = game.add.sprite(150, game.world.height - 160, 'platform');
+    this.sword.scale.setTo(.4,1.6);
+    this.sword.anchor.setTo(0.5, 0.9);
+    this.sword.previousPosition = new pair(this.sword.position.x, this.sword.position.y);  
+    this.sword.weight = 10;
 
     //set some various constants 
     speed = 3;
@@ -280,14 +300,47 @@ function create() {
     
     this.formerMouse = -1;
     
-    player.currAttack = 0;
-    player.attackFrame = 0;
-    player.hit = 0;
-    player.queuedAttack = 0;
-    player.attacks = new Array(10);
-    player.health = 1000;
-    player.healthText = game.add.text(50, 50, 'Player health: ' + player.health, { fill: '#ffffff' });
+    this.currAttack = 0;
+    this.attackFrame = 0;
+    this.hit = 0;
+    this.queuedAttack = 0;
+    this.attacks = new Array(10);
+    this.health = 1000;
+    this.healthText = game.add.text(50, 50, 'Player health: ' + this.health, { fill: '#ffffff' });
+
+    jab1  = 2;
+    jab2  = 1;
+    jab3  = 2;
+    block = 3;
+
+    this.attacks[0] = createAttack(0, 0, [0,0],0,0);
+
+    this.attacks[1] = createAttack(1, 17, 
+    [[-2,.5],[-3,.5],[-2,.5],[-1,.5],[-.5,0],[-.5,0],[-.5,0], //windup
+     [0,0],[1,-.5],[2,-.5],[2,-.5],[3,0],[3,0],[3,0],[3,0],[3,0],[3,0],[3,0],[2,.5],[2,.5],[1,.5],[1,.5],[.5,.5],[0,.5]], //swing 
+    [-.05,-.1,-.15,-.2,-.15,-.15,.1,0,.05,.75,.1,.125,.15,.175,.2,.175,.15,.1],//rotations
+    [0,0,0,0,0,0,0,15,25,40,100,100,40,25,20,15,10]); //hitboxes
+
+    this.attacks[2] = generateAttack(2, 68, [[-20,2,20,1],[60,10,28,2],[5,20,20,0]],[[-1.5,20, 1],[3,28,1],[.2,20,0]],[[0,20],[90,28],[0,20]]);
+    this.attacks[3] = generateAttack(3, blockTime, [[-20,-20,blockTime-3,0],[0,0,3,0]],[[3.14/2,blockTime - 2,1],[0,2,0]],[[0,blockTime - 2],[0,2]]);
+}
+
+function create() {
+    game.canvas.oncontextmenu = function (e) { e.preventDefault(); }
+    //  A simple background for our game
+    game.add.sprite(0, 0, 'sky');
+    // The player and its settings
     
+    player = new Player(myId, game);
+
+    enemy = game.add.sprite(300, game.world.height - 290, 'star');
+    enemy.anchor.setTo(.5,.5);
+    enemy.sword = game.add.sprite(300, game.world.height - 280, 'platform');
+    enemy.sword.scale.setTo(.4,1.6);
+    enemy.sword.anchor.setTo(0.5, 0.9);   
+    enemy.sword.previousPosition = new pair(enemy.sword.position.x, enemy.sword.position.y);  
+    enemy.sword.weight = 10;
+
     enemy.currAttack = 0;
     enemy.attackFrame = 0;
     enemy.hit = 0;
@@ -296,21 +349,6 @@ function create() {
     enemy.health  = 1000;
     enemy.healthText = game.add.text(game.world.width - 300, 50, 'Enemy health: ' + enemy.health, { fill: '#ffffff' });
      
-    jab1  = 2;
-    jab2  = 1;
-    jab3  = 2;
-    block = 3;
-
-    player.attacks[0] = createAttack(0, 0, [0,0],0,0);
-
-    player.attacks[1] = createAttack(1, 17, 
-    [[-2,.5],[-3,.5],[-2,.5],[-1,.5],[-.5,0],[-.5,0],[-.5,0], //windup
-     [0,0],[1,-.5],[2,-.5],[2,-.5],[3,0],[3,0],[3,0],[3,0],[3,0],[3,0],[3,0],[2,.5],[2,.5],[1,.5],[1,.5],[.5,.5],[0,.5]], //swing 
-    [-.05,-.1,-.15,-.2,-.15,-.15,.1,0,.05,.75,.1,.125,.15,.175,.2,.175,.15,.1],//rotations
-    [0,0,0,0,0,0,0,15,25,40,100,100,40,25,20,15,10]); //hitboxes
-
-    player.attacks[2] = generateAttack(2, 68, [[-20,2,20,1],[60,10,28,2],[5,20,20,0]],[[-1.5,20, 1],[3,28,1],[.2,20,0]],[[0,20],[90,28],[0,20]]);
-    player.attacks[3] = generateAttack(3, blockTime, [[-20,-20,blockTime-3,0],[0,0,3,0]],[[3.14/2,blockTime - 2,1],[0,2,0]],[[0,blockTime - 2],[0,2]]);
 }
 
 function generateAttack(num, totalFrames, movements, rotations, hitboxes){
