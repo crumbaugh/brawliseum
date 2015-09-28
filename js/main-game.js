@@ -6,6 +6,7 @@ function preload() {
     game.load.image('ground', 'assets/platform.png');
     game.load.image('star', 'assets/star.png'); 
     game.load.spritesheet('dude', 'assets/dude.png', 32, 48);
+    game.load.image('boring-arena', 'assets/boring-arena.jpg');
 }
 
 var Attack;
@@ -22,10 +23,89 @@ function createAttack(num, frames, movements, rotations, hitboxes) {
 
 function pair(x,y) { this.x = x; this.y = y}
 
+function create() {
+    game.canvas.oncontextmenu = function (e) { e.preventDefault(); }
+    //  A simple background for our game
+    game.add.sprite(0, 0, 'sky');
+
+    // the ground
+
+    ground = game.add.sprite(game.world.width/2, game.world.height/2, 'boring-arena');
+    ground.anchor.setTo(.5, .5);
+    ground.width = .5 * game.world.width;
+    ground.height = .5 * game.world.height;
+
+    // The player and its settings
+    
+    player = game.add.sprite(game.world.width/3, game.world.height/2, 'dude');
+    player.anchor.setTo(.5,.5);
+    player.sword = game.add.sprite(player.x, player.y, 'platform');
+    player.sword.scale.setTo(.4,1.6);
+    player.sword.anchor.setTo(0.5, 0.9);
+    player.sword.previousPosition = new pair(player.sword.position.x, player.sword.position.y);  
+    player.sword.weight = 10;
+
+    enemy = game.add.sprite(game.world.width*2/3, game.world.height/2, 'star');
+    enemy.anchor.setTo(.5,.5);
+    enemy.sword = game.add.sprite(enemy.x, enemy.y, 'platform');
+    enemy.sword.scale.setTo(.4,1.6);
+    enemy.sword.anchor.setTo(0.5, 0.9);   
+    enemy.sword.previousPosition = new pair(enemy.sword.position.x, enemy.sword.position.y);  
+    enemy.sword.weight = 10;
+
+    //set some various constants 
+    speed = 3;
+    maxDistance = 20;
+    minDistance = 10;
+
+    upkey = game.input.keyboard.addKey(Phaser.Keyboard.W);
+    downkey = game.input.keyboard.addKey(Phaser.Keyboard.S);
+    leftkey = game.input.keyboard.addKey(Phaser.Keyboard.A);
+    rightkey = game.input.keyboard.addKey(Phaser.Keyboard.D);
+    
+    this.formerMouse = -1;
+    
+    player.currAttack = 0;
+    player.attackFrame = 0;
+    player.hit = 0;
+    player.queuedAttack = 0;
+    player.attacks = new Array(10);
+    player.health = 1000;
+    player.healthText = game.add.text(50, 50, 'Player health: ' + player.health, { fill: '#ffffff' });
+    player.falling = false;
+    player.fallingrate = 0;
+    
+    enemy.currAttack = 0;
+    enemy.attackFrame = 0;
+    enemy.hit = 0;
+    enemy.queuedAttack = 0;
+    enemy.attacks = new Array(10); 
+    enemy.health  = 1000;
+    enemy.healthText = game.add.text(game.world.width - 300, 50, 'Enemy health: ' + enemy.health, { fill: '#ffffff' });
+    enemy.falling = false;
+    enemy.fallingrate = 0;
+
+    jab1  = 2;
+    jab2  = 1;
+    jab3  = 2;
+    block = 3;
+
+    player.attacks[0] = createAttack(0, 0, [0,0],0,0);
+
+    player.attacks[1] = createAttack(1, 17, 
+    [[-2,.5],[-3,.5],[-2,.5],[-1,.5],[-.5,0],[-.5,0],[-.5,0], //windup
+     [0,0],[1,-.5],[2,-.5],[2,-.5],[3,0],[3,0],[3,0],[3,0],[3,0],[3,0],[3,0],[2,.5],[2,.5],[1,.5],[1,.5],[.5,.5],[0,.5]], //swing 
+    [-.05,-.1,-.15,-.2,-.15,-.15,.1,0,.05,.75,.1,.125,.15,.175,.2,.175,.15,.1],//rotations
+    [0,0,0,0,0,0,0,15,25,40,100,100,40,25,20,15,10]); //hitboxes
+
+    player.attacks[2] = generateAttack(2, 68, [[-20,2,20,1],[60,10,28,2],[5,20,20,0]],[[-1.5,20, 1],[3,28,1],[.2,20,0]],[[0,20],[90,28],[0,20]]);
+    player.attacks[3] = generateAttack(3, blockTime, [[-20,-20,blockTime-3,0],[0,0,3,0]],[[3.14/2,blockTime - 2,1],[0,2,0]],[[0,blockTime - 2],[0,2]]);
+}
+
 function update() {
     move();
     if (game.input.mouse.button == 0 && this.formerMouse == -1 && player.currAttack != -1){ 
-        if ( player.currAttack == 0) {
+        if (player.currAttack == 0) {
             player.currAttack = jab1;
             player.attackString = "jab1";
         } else if (player.attackString == "jab1" && player.attacks[player.currAttack].hitboxes[player.attackFrame] != 0) {
@@ -58,6 +138,16 @@ function update() {
         attack(enemy);
 
     checkCollisions();
+    checkFalling();
+    if (player.falling) {
+        fall(player);
+    }
+    if (enemy.falling) {
+        fall(enemy);
+    }
+
+    player.healthText.text = 'Player health: ' + player.health;
+    enemy.healthText.text = 'Enemy health: ' + enemy.health;
     
     this.formerMouse = game.input.mouse.button;
     player.sword.previousPosition.x = player.sword.position.x;
@@ -156,7 +246,6 @@ function checkCollisions(){
         enemy.healthText.text = 'Enemy health: ' + enemy.health;
     } 
 }
-
 function collide(sword1, sword2) {
     var velocity1 = {}; //new sword1 velocity
     var velocity2 = {}; //new sword2 velocity
@@ -223,75 +312,33 @@ function attack(thisPlayer) {
     thisPlayer.attackFrame++;
 }
 
+function checkFalling() {
+    if (!checkOverlap(player, ground)) {
+        player.falling = true;
+    }
+    if (!checkOverlap(enemy, ground)) {
+        player.falling = true;
+    }
+}
+
+
+function fall (faller){
+    var rate = faller.fallingrate;
+    faller.rotation = 0;
+    faller.width -= rate;
+    faller.height -= rate;
+    faller.sword.kill();
+    if (faller.width <= 20 || faller.height <= 20) {
+        faller.health = 0;
+        faller.kill();
+    }
+    faller.fallingrate += .01;
+}
+
 var platforms;
 var score = 0;
 var scoreText;
-function create() {
-    game.canvas.oncontextmenu = function (e) { e.preventDefault(); }
-    //  A simple background for our game
-    game.add.sprite(0, 0, 'sky');
-    // The player and its settings
-    
-    player = game.add.sprite(150, game.world.height - 150, 'dude');
-    player.anchor.setTo(.5,.5);
-    player.sword = game.add.sprite(150, game.world.height - 160, 'platform');
-    player.sword.scale.setTo(.4,1.6);
-    player.sword.anchor.setTo(0.5, 0.9);
-    player.sword.previousPosition = new pair(player.sword.position.x, player.sword.position.y);  
-    player.sword.weight = 10;
 
-    enemy = game.add.sprite(300, game.world.height - 290, 'star');
-    enemy.anchor.setTo(.5,.5);
-    enemy.sword = game.add.sprite(300, game.world.height - 280, 'platform');
-    enemy.sword.scale.setTo(.4,1.6);
-    enemy.sword.anchor.setTo(0.5, 0.9);   
-    enemy.sword.previousPosition = new pair(enemy.sword.position.x, enemy.sword.position.y);  
-    enemy.sword.weight = 10;
-
-    //set some various constants 
-    speed = 3;
-    maxDistance = 20;
-    minDistance = 10;
-
-    upkey = game.input.keyboard.addKey(Phaser.Keyboard.W);
-    downkey = game.input.keyboard.addKey(Phaser.Keyboard.S);
-    leftkey = game.input.keyboard.addKey(Phaser.Keyboard.A);
-    rightkey = game.input.keyboard.addKey(Phaser.Keyboard.D);
-    
-    this.formerMouse = -1;
-    
-    player.currAttack = 0;
-    player.attackFrame = 0;
-    player.hit = 0;
-    player.queuedAttack = 0;
-    player.attacks = new Array(10);
-    player.health = 1000;
-    player.healthText = game.add.text(50, 50, 'Player health: ' + player.health, { fill: '#ffffff' });
-    
-    enemy.currAttack = 0;
-    enemy.attackFrame = 0;
-    enemy.hit = 0;
-    enemy.queuedAttack = 0;
-    enemy.attacks = new Array(10); 
-    enemy.health  = 1000;
-    enemy.healthText = game.add.text(game.world.width - 300, 50, 'Enemy health: ' + enemy.health, { fill: '#ffffff' });
-     
-    jab1  = 2;
-    jab2  = 1;
-    jab3  = 2;
-    block = 3;
-
-    player.attacks[0] = createAttack(0, 0, [0,0],0,0);
-
-    player.attacks[1] = createAttack(1, 17, 
-    [[-2,.5],[-3,.5],[-2,.5],[-1,.5],[-.5,0],[-.5,0],[-.5,0], //windup
-     [0,0],[1,-.5],[2,-.5],[2,-.5],[3,0],[3,0],[3,0],[3,0],[3,0],[3,0],[3,0],[2,.5],[2,.5],[1,.5],[1,.5],[.5,.5],[0,.5]], //swing 
-    [-.05,-.1,-.15,-.2,-.15,-.15,.1,0,.05,.75,.1,.125,.15,.175,.2,.175,.15,.1],//rotations
-    [0,0,0,0,0,0,0,15,25,40,100,100,40,25,20,15,10]); //hitboxes
-
-    player.attacks[2] = generateAttack(2, 68, [[-20,2,20,1],[60,10,28,2],[5,20,20,0]],[[-1.5,20, 1],[3,28,1],[.2,20,0]],[[0,20],[90,28],[0,20]]);
-    player.attacks[3] = generateAttack(3, blockTime, [[-20,-20,blockTime-3,0],[0,0,3,0]],[[3.14/2,blockTime - 2,1],[0,2,0]],[[0,blockTime - 2],[0,2]]);
-}
 
 function generateAttack(num, totalFrames, movements, rotations, hitboxes){
     var currFrame = 0;
