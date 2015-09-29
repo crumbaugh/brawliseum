@@ -21,7 +21,7 @@ function createAttack(num, frames, movements, rotations, hitboxes) {
     return Attack;
 }
 
-function pair(x,y) { this.x = x; this.y = y}
+function pair(x,y) { this.x = x; this.y = y }
 
 function create() {
     game.canvas.oncontextmenu = function (e) { e.preventDefault(); }
@@ -29,14 +29,12 @@ function create() {
     game.add.sprite(0, 0, 'sky');
 
     // the ground
-
     ground = game.add.sprite(game.world.width/2, game.world.height/2, 'boring-arena');
     ground.anchor.setTo(.5, .5);
     ground.width = .5 * game.world.width;
     ground.height = .5 * game.world.height;
 
     // The player and its settings
-    
     player = game.add.sprite(game.world.width/3, game.world.height/2, 'dude');
     player.anchor.setTo(.5,.5);
     player.sword = game.add.sprite(player.x, player.y, 'platform');
@@ -44,6 +42,15 @@ function create() {
     player.sword.anchor.setTo(0.5, 0.9);
     player.sword.previousPosition = new pair(player.sword.position.x, player.sword.position.y);  
     player.sword.weight = 10;
+    player.currAttack = -1;
+    player.attackFrame = 0;
+    player.hit = 0;
+    player.queuedAttack = 0;
+    player.attacks = new Array(10);
+    player.health = 1000;
+    player.healthText = game.add.text(50, 50, 'Player health: ' + player.health, { fill: '#ffffff' });
+    player.falling = false;
+    player.fallingrate = 0;
 
     enemy = game.add.sprite(game.world.width*2/3, game.world.height/2, 'star');
     enemy.anchor.setTo(.5,.5);
@@ -52,6 +59,15 @@ function create() {
     enemy.sword.anchor.setTo(0.5, 0.9);   
     enemy.sword.previousPosition = new pair(enemy.sword.position.x, enemy.sword.position.y);  
     enemy.sword.weight = 10;
+    enemy.currAttack = -1;
+    enemy.attackFrame = 0;
+    enemy.hit = 0;
+    enemy.queuedAttack = 0;
+    enemy.attacks = new Array(10); 
+    enemy.health  = 1000;
+    enemy.healthText = game.add.text(game.world.width - 300, 50, 'Enemy health: ' + enemy.health, { fill: '#ffffff' });
+    enemy.falling = false;
+    enemy.fallingrate = 0;
 
     //set some various constants 
     speed = 3;
@@ -64,26 +80,6 @@ function create() {
     rightkey = game.input.keyboard.addKey(Phaser.Keyboard.D);
     
     this.formerMouse = -1;
-    
-    player.currAttack = 0;
-    player.attackFrame = 0;
-    player.hit = 0;
-    player.queuedAttack = 0;
-    player.attacks = new Array(10);
-    player.health = 1000;
-    player.healthText = game.add.text(50, 50, 'Player health: ' + player.health, { fill: '#ffffff' });
-    player.falling = false;
-    player.fallingrate = 0;
-    
-    enemy.currAttack = 0;
-    enemy.attackFrame = 0;
-    enemy.hit = 0;
-    enemy.queuedAttack = 0;
-    enemy.attacks = new Array(10); 
-    enemy.health  = 1000;
-    enemy.healthText = game.add.text(game.world.width - 300, 50, 'Enemy health: ' + enemy.health, { fill: '#ffffff' });
-    enemy.falling = false;
-    enemy.fallingrate = 0;
 
     jab1  = 2;
     jab2  = 1;
@@ -224,6 +220,7 @@ function move() {
             player.sword.position.y += speed*.2;
         }
     }
+
     //point sword forward
     player.sword.position.x -= (Math.sin(oldPlayerRotation) - Math.sin(player.rotation)) * minDistance; 
     player.sword.position.y += (Math.cos(oldPlayerRotation) - Math.cos(player.rotation)) * minDistance;  
