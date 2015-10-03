@@ -50,17 +50,16 @@ var eurecaClientSetup = function() {
             var speed = state.speed;
             var attackFrame = state.attackFrame;
             var sword = player.sword;
+
             userList[id].player.position.x = state.x;
             userList[id].player.position.y = state.y;
             userList[id].player.sword.position.x = state.sx;
             userList[id].player.sword.position.y = state.sy;
-
-
-
-            userList[id].update();
         }
     }
 }
+
+// TODO: HANDLE REFRESHING A PAGE BECAUSE THAT DOESNT WORK RIGHT NOW
 
 var game = new Phaser.Game(800, 600, Phaser.CANVAS, 'phaser-example', { preload: preload, create: eurecaClientSetup, update: update });
 
