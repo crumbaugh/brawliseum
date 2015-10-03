@@ -45,9 +45,18 @@ var eurecaClientSetup = function() {
     eurecaClient.exports.updateState = function(id, state)
     {
         if (userList[id])  {
-            userList[id].player.x = state.x;
-            userList[id].player.y = state.y;
-            // TODO: add more stuff
+            var player = userList[id].player;
+            var currAttack = state.currAttack;
+            var speed = state.speed;
+            var attackFrame = state.attackFrame;
+            var sword = player.sword;
+            userList[id].player.position.x = state.x;
+            userList[id].player.position.y = state.y;
+            userList[id].player.sword.position.x = state.sx;
+            userList[id].player.sword.position.y = state.sy;
+
+
+
             userList[id].update();
         }
     }
@@ -65,18 +74,21 @@ function preload() {
 }
 
 function update() {
+    if (!ready) return;
+
     for (var i in userList)
     {
         if (!userList[i]) continue;
         for (var j in userList)
         {
             if (!userList[j]) continue;
-            if (j!=i) 
+            if (userList[j].alive)
             {
-                userList[j].update();           
-            }       
+                userList[j].update();
+            }           
         }
     }
+
 }
 
 var platforms;

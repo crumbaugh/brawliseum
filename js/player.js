@@ -14,15 +14,15 @@ User = function(myId, game, player) {
     this.health = STARTING_HEALTH;
     this.user = player;
 
-    this.speed = 3;
-    this.maxDistance = 20;
-    this.minDistance = 10;
-
     this.player = game.add.sprite(150, game.world.height - 150, 'dude');
     this.player.id = myId;
     game.physics.enable(this.player, Phaser.Physics.ARCADE);
     this.player.anchor.setTo(.5,.5);
     this.player.body.collideWorldBounds = true;
+
+    this.player.speed = 3;
+    this.player.maxDistance = 20;
+    this.player.minDistance = 10;
 
     upkey = game.input.keyboard.addKey(Phaser.Keyboard.W);
     downkey = game.input.keyboard.addKey(Phaser.Keyboard.S);
@@ -31,6 +31,7 @@ User = function(myId, game, player) {
     
     this.formerMouse = -1;
     
+    this.alive = true;
     this.player.currAttack = 0;
     this.player.attackFrame = 0;
     this.player.hit = 0;
@@ -49,77 +50,94 @@ User = function(myId, game, player) {
 
 
 User.prototype.update = function() {
-	this.move(this.player, this.player.sword);
+	if (leftkey.isDown || rightkey.isDown
+		|| upkey.isDown || downkey.isDown) {
+		this.move(this.player, this.player.sword);
+	}
 };
 
 User.prototype.move = function(player, sword) {
-	var speed = this.speed
-if (player.currAttack == 0) { //attack lock
-        oldPlayerRotation = player.rotation;    
-        player.rotation = -game.math.angleBetween(game.input.activePointer.x, game.input.activePointer.y, player.x, player.y); 
+if (player.id == myId) {
+	var speed = player.speed;
+	var currAttack = player.currAttack;
+	var attackFrame = player.attackFrame;
 
+	var x = player.position.x;
+	var y = player.position.y;
+	var sx = sword.position.x;
+	var sy = sword.position.y;
+
+    // if (currAttack == 0) { //attack lock
         if (leftkey.isDown){
-            player.position.x += -speed;
-            sword.position.x += -speed;
+        	x -= speed;
+        	sx -= speed;
         }
         if (rightkey.isDown){
-            player.position.x += speed;
-            sword.position.x += speed;
+        	x += speed;
+        	sx += speed;
         }
         if (upkey.isDown){
-            player.position.y += -speed;
-            sword.position.y += -speed;
+        	y -= speed;
+        	sy -= speed;
         }
         if (downkey.isDown){
-            player.position.y += speed;
-            sword.position.y += speed;
+        	y += speed;
+        	sy += speed;
         }
-    } else if (player.currAttack == -1) { //regain speed during player.sword.return
+
+    var inputkeys = {
+		speed:player.speed,
+		currAttack:player.currAttack,
+		attackFrame:player.attackFrame,
+		x:x,
+		y:y,
+		sx:sx,
+		sy:sy
+	}
+    // } else if (player.currAttack == -1) { //regain speed during player.sword.return
+    //     if (leftkey.isDown){
+    //         player.position.x += -speed*(.2+(player.attackFrame/returnTime));
+    //         sword.position.x += -speed*(.2+(player.attackFrame/returnTime));
+    //     }
+    //     if (rightkey.isDown){
+    //         player.position.x += speed*(.2+(player.attackFrame/returnTime));
+    //         sword.position.x += speed*(.2+(player.attackFrame/returnTime));
+    //     }
+    //     if (upkey.isDown){
+    //         player.position.y += -speed*(.2+(player.attackFrame/returnTime));
+    //         sword.position.y += -speed*(.2+(player.attackFrame/returnTime));
+    //     }
+    //     if (downkey.isDown){
+    //         player.position.y += speed*(.2+(player.attackFrame/returnTime));
+    //         sword.position.y += speed*(.2+(player.attackFrame/returnTime));
+    //     }    
+    // } else { 
+    //     var oldPlayerRotation = player.rotation;    
+    //     player.rotation += (-game.math.angleBetween(game.input.activePointer.x, game.input.activePointer.y, player.x, player.y)
+    //                         -oldPlayerRotation)*.02; 
+    //     // player.sword.rotation += player.rotation - oldPlayerRotation;
         
-        var oldPlayerRotation = player.rotation;    
-        player.rotation += (-game.math.angleBetween(game.input.activePointer.x, game.input.activePointer.y, player.x, player.y)
-                            -oldPlayerRotation)*(.02 + (player.attackFrame/returnTime)); 
-        // player.sword.rotation += player.rotation - oldPlayerRotation;
-        
-        if (leftkey.isDown){
-            player.position.x += -speed*(.2+(player.attackFrame/returnTime));
-            sword.position.x += -speed*(.2+(player.attackFrame/returnTime));
-        }
-        if (rightkey.isDown){
-            player.position.x += speed*(.2+(player.attackFrame/returnTime));
-            sword.position.x += speed*(.2+(player.attackFrame/returnTime));
-        }
-        if (upkey.isDown){
-            player.position.y += -speed*(.2+(player.attackFrame/returnTime));
-            sword.position.y += -speed*(.2+(player.attackFrame/returnTime));
-        }
-        if (downkey.isDown){
-            player.position.y += speed*(.2+(player.attackFrame/returnTime));
-            sword.position.y += speed*(.2+(player.attackFrame/returnTime));
-        }    
-    } else { 
-        var oldPlayerRotation = player.rotation;    
-        player.rotation += (-game.math.angleBetween(game.input.activePointer.x, game.input.activePointer.y, player.x, player.y)
-                            -oldPlayerRotation)*.02; 
-        // player.sword.rotation += player.rotation - oldPlayerRotation;
-        
-        if (leftkey.isDown){
-            player.position.x += -speed*.2;
-            sword.position.x += -speed*.2;
-        }
-        if (rightkey.isDown){
-            player.position.x += speed*.2;
-            sword.position.x += speed*.2;
-        }
-        if (upkey.isDown){
-            player.position.y += -speed*.2;
-            sword.position.y += -speed*.2;
-        }
-        if (downkey.isDown){
-            player.position.y += speed*.2;
-            sword.position.y += speed*.2;
-        }
-    }
-	// send latest valid state to the server
-	eurecaServer.handleKeys(player.position);
+    //     if (leftkey.isDown){
+    //         player.position.x += -speed*.2;
+    //         sword.position.x += -speed*.2;
+    //     }
+    //     if (rightkey.isDown){
+    //         player.position.x += speed*.2;
+    //         sword.position.x += speed*.2;
+    //     }
+    //     if (upkey.isDown){
+    //         player.position.y += -speed*.2;
+    //         sword.position.y += -speed*.2;
+    //     }
+    //     if (downkey.isDown){
+    //         player.position.y += speed*.2;
+    //         sword.position.y += speed*.2;
+    //     }
+	eurecaServer.handleKeys(inputkeys);
+	}
+}
+
+User.prototype.kill = function() {
+	this.alive = false;
+	this.player.kill();
 }
