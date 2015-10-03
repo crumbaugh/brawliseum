@@ -6,18 +6,20 @@ var express = require('express')
 // serve static files from the current directory
 app.use(express.static(__dirname));
 
+var clients = {}; 
+
+
 //get EurecaServer class
 var EurecaServer = require('eureca.io').EurecaServer;
  
 //create an instance of EurecaServer
-var eurecaServer = new EurecaServer({allow:['setId']});
-var clients = {}; 
+var eurecaServer = new EurecaServer({allow:['setId', 'spawnEnemy', 'kill', 'updateState']});
 //attach eureca.io to our http server
 eurecaServer.attach(server);
 
 //detect client connection
 eurecaServer.onConnect(function (conn) {    
-    console.log('New Client id=%s ', conn.id, conn.remoteAddress);
+    console.log('New Player id=%s ', conn.id, conn.remoteAddress);
 
     var remote = eurecaServer.getClient(conn.id);    
 	
@@ -30,11 +32,46 @@ eurecaServer.onConnect(function (conn) {
  
 //detect client disconnection
 eurecaServer.onDisconnect(function (conn) {    
-    console.log('Client disconnected ', conn.id);
-    	
+    console.log('Player disconnected ', conn.id);
+
 	var removeId = clients[conn.id].id;
 	
 	delete clients[conn.id];
+
+    for (var c in clients)
+    {
+        var remote = clients[c].remote;
+
+        remote.kill(conn.id);
+    }
 });
+
+eurecaServer.exports.handshake = function()
+{
+    for (var c in clients)
+    {
+        var remote = clients[c].remote;
+        for (var cc in clients)
+        {       
+            var x = clients[cc].laststate ? clients[cc].laststate.x: 0;
+            var y = clients[cc].laststate ? clients[cc].laststate.y: 0;
+            remote.spawnEnemy(clients[cc].id, x, y);        
+        }
+    }
+}
+
+eurecaServer.exports.handleKeys = function (keys) {
+    var conn = this.connection;
+    var updatedClient = clients[conn.id];
+    
+    for (var c in clients)
+    {
+        var remote = clients[c].remote;
+        remote.updateState(updatedClient.id, keys);
+        
+        //keep last known state so we can send it to new connected clients
+        clients[c].laststate = keys;
+    }
+}
 
 server.listen(8000);
