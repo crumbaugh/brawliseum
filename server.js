@@ -53,8 +53,8 @@ eurecaServer.exports.handshake = function()
         var remote = clients[c].remote;
         for (var cc in clients)
         {       
-            var x = clients[cc].laststate ? clients[cc].laststate.x: 0;
-            var y = clients[cc].laststate ? clients[cc].laststate.y: 0;
+            var x = clients[cc].laststate ? clients[cc].laststate.sx: 0;
+            var y = clients[cc].laststate ? clients[cc].laststate.sy: 0;
             remote.spawnEnemy(clients[cc].id, x, y);        
         }
     }
