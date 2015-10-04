@@ -1,7 +1,7 @@
-var game = new Phaser.Game(800, 600, Phaser.CANVAS, '', { preload: preload, create: create, update: update });
+var playState = {preload: playPreload, create: playCreate, update: playUpdate};
 var returnTime = 8;
 var blockTime = 8;
-function preload() {
+function playPreload () {
     game.load.image('sky', 'assets/sky.png');
     game.load.image('ground', 'assets/platform.png');
     game.load.image('star', 'assets/star.png'); 
@@ -23,7 +23,7 @@ function createAttack(num, frames, movements, rotations, hitboxes) {
 
 function pair(x,y) { this.x = x; this.y = y}
 
-function create() {
+function playCreate () {
     game.canvas.oncontextmenu = function (e) { e.preventDefault(); }
     //  A simple background for our game
     game.add.sprite(0, 0, 'sky');
@@ -102,7 +102,7 @@ function create() {
     player.attacks[3] = generateAttack(3, blockTime, [[-20,-20,blockTime-3,0],[0,0,3,0]],[[3.14/2,blockTime - 2,1],[0,2,0]],[[0,blockTime - 2],[0,2]]);
 }
 
-function update() {
+function playUpdate () {
     move();
     if (game.input.mouse.button == 0 && this.formerMouse == -1 && player.currAttack != -1){ 
         if (player.currAttack == 0) {
@@ -388,6 +388,7 @@ function generateAttack(num, totalFrames, movements, rotations, hitboxes){
     
     return createAttack(num, totalFrames, tempMovements, tempRotations, tempHitboxes);
 }
+
 function triangleNumber(n)
 {
     return (n*n+n)/2;

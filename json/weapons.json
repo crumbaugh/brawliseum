@@ -1,24 +1,47 @@
-[
-    {
-        "name": "Cuke",
-        "description": "Whose idea was it to use a cucumber as a weapon...?",
-        "image": "N/A",
-        "stats": {
-            "damage": 1,
-            "speed": 20,
-            "range": 10,
-            "knockback": 1
+{ "weapons" : [
+        {
+           "name": "Cuke",
+           "description": "Whose idea was it to use a cucumber as a weapon...?",
+           "image": "N/A",
+            "stats": {
+               "damage": 1,
+               "speed": 20,
+               "range": 10,
+              "knockback": 1
+            }
+       },
+       {
+            "name": "CukeNuke",
+            "description": "Turns out that cucumbers gain physics-defying properties when you pickle them.",
+            "image": "N/A",
+            "stats": {
+                "damage": 50,
+                "speed": 5,
+                "range": 5,
+                "knockback": 30
+            }
+        },
+        {
+            "name": "Swordfish",
+            "description": "What do I look like, Aquaman? You figure out how to use it.",
+            "image": "N/A",
+            "stats": {
+                "damage": 50,
+                "speed": 5,
+                "range": 5,
+                "knockback": 30
+            }
+        },
+        {
+            "name": "Wordfish",
+            "description": "The wordfish is mightier than the swordfish.",
+            "image": "N/A",
+            "stats": {
+                "damage": 50,
+                "speed": 5,
+                "range": 5,
+                "knockback": 30
+            }
         }
-    }
-    {
-        "name": "CukeNuke",
-        "description": "Turns out that cucumbers gain physics-defying properties when you pickle them.",
-        "image": "N/A",
-        "stats": {
-            "damage": 50,
-            "speed": 5,
-            "range": 5,
-            "knockback": 30
-        }
-    }
-]
+    ]
+}
