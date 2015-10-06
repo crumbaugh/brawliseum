@@ -5,7 +5,7 @@ function preload() {
     game.load.image('sky', 'assets/sky.png');
     game.load.image('ground', 'assets/platform.png');
     game.load.image('star', 'assets/star.png'); 
-    game.load.spritesheet('dude', 'assets/dude.png', 32, 48);
+    game.load.spritesheet('dude', 'assets/dude.png', 48, 48);
     game.load.image('boring-arena', 'assets/boring-arena.jpg');
 }
 
@@ -37,8 +37,9 @@ function create() {
     // The player and its settings
     player = game.add.sprite(game.world.width/3, game.world.height/2, 'dude');
     player.anchor.setTo(.5,.5);
-    player.sword = game.add.sprite(player.x, player.y, 'platform');
-    player.sword.scale.setTo(.4,1.6);
+    player.sword = game.add.sprite(player.x, player.y, 'ground');
+    player.sword.rotation = -45;
+    player.sword.scale.setTo(.33,.33);
     player.sword.anchor.setTo(0.5, 0.9);
     player.sword.previousPosition = new pair(player.sword.position.x, player.sword.position.y);  
     player.sword.weight = 10;
@@ -71,8 +72,8 @@ function create() {
 
     //set some various constants 
     speed = 3;
-    maxDistance = 20;
-    minDistance = 10;
+    maxDistance = 50;
+    minDistance = 35;
 
     upkey = game.input.keyboard.addKey(Phaser.Keyboard.W);
     downkey = game.input.keyboard.addKey(Phaser.Keyboard.S);
