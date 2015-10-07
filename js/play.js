@@ -5,7 +5,7 @@ function playPreload () {
     game.load.image('sky', 'assets/sky.png');
     game.load.image('ground', 'assets/platform.png');
     game.load.image('star', 'assets/star.png'); 
-    game.load.spritesheet('dude', 'assets/dude.png', 32, 48);
+    game.load.spritesheet('dude', 'assets/dude.png', 48, 48);
     game.load.image('boring-arena', 'assets/boring-arena.jpg');
 }
 
@@ -21,50 +21,28 @@ function createAttack(num, frames, movements, rotations, hitboxes) {
     return Attack;
 }
 
-function pair(x,y) { this.x = x; this.y = y}
+function pair(x,y) { this.x = x; this.y = y }
 
 function playCreate () {
     game.canvas.oncontextmenu = function (e) { e.preventDefault(); }
     //  A simple background for our game
     game.add.sprite(0, 0, 'sky');
     // the ground
-
     ground = game.add.sprite(game.world.width/2, game.world.height/2, 'boring-arena');
     ground.anchor.setTo(.5, .5);
     ground.width = .5 * game.world.width;
     ground.height = .5 * game.world.height;
 
     // The player and its settings
-    
     player = game.add.sprite(game.world.width/3, game.world.height/2, 'dude');
     player.anchor.setTo(.5,.5);
-    player.sword = game.add.sprite(player.x, player.y, 'platform');
-    player.sword.scale.setTo(.4,1.6);
+    player.sword = game.add.sprite(player.x, player.y, 'ground');
+    player.sword.rotation = -45;
+    player.sword.scale.setTo(.33,.33);
     player.sword.anchor.setTo(0.5, 0.9);
     player.sword.previousPosition = new pair(player.sword.position.x, player.sword.position.y);  
     player.sword.weight = 10;
-
-    enemy = game.add.sprite(game.world.width*2/3, game.world.height/2, 'star');
-    enemy.anchor.setTo(.5,.5);
-    enemy.sword = game.add.sprite(enemy.x, enemy.y, 'platform');
-    enemy.sword.scale.setTo(.4,1.6);
-    enemy.sword.anchor.setTo(0.5, 0.9);   
-    enemy.sword.previousPosition = new pair(enemy.sword.position.x, enemy.sword.position.y);  
-    enemy.sword.weight = 10;
-
-    //set some various constants 
-    speed = 3;
-    maxDistance = 20;
-    minDistance = 10;
-
-    upkey = game.input.keyboard.addKey(Phaser.Keyboard.W);
-    downkey = game.input.keyboard.addKey(Phaser.Keyboard.S);
-    leftkey = game.input.keyboard.addKey(Phaser.Keyboard.A);
-    rightkey = game.input.keyboard.addKey(Phaser.Keyboard.D);
-    
-    this.formerMouse = -1;
-    
-    player.currAttack = 0;
+    player.currAttack = -1;
     player.attackFrame = 0;
     player.hit = 0;
     player.queuedAttack = 0;
@@ -73,8 +51,15 @@ function playCreate () {
     player.healthText = game.add.text(50, 50, 'Player health: ' + player.health, { fill: '#ffffff' });
     player.falling = false;
     player.fallingrate = 0;
-    
-    enemy.currAttack = 0;
+
+    enemy = game.add.sprite(game.world.width*2/3, game.world.height/2, 'star');
+    enemy.anchor.setTo(.5,.5);
+    enemy.sword = game.add.sprite(enemy.x, enemy.y, 'platform');
+    enemy.sword.scale.setTo(.4,1.6);
+    enemy.sword.anchor.setTo(0.5, 0.9);   
+    enemy.sword.previousPosition = new pair(enemy.sword.position.x, enemy.sword.position.y);  
+    enemy.sword.weight = 10;
+    enemy.currAttack = -1;
     enemy.attackFrame = 0;
     enemy.hit = 0;
     enemy.queuedAttack = 0;
@@ -83,6 +68,18 @@ function playCreate () {
     enemy.healthText = game.add.text(game.world.width - 300, 50, 'Enemy health: ' + enemy.health, { fill: '#ffffff' });
     enemy.falling = false;
     enemy.fallingrate = 0;
+
+    //set some various constants 
+    speed = 3;
+    maxDistance = 50;
+    minDistance = 35;
+
+    upkey = game.input.keyboard.addKey(Phaser.Keyboard.W);
+    downkey = game.input.keyboard.addKey(Phaser.Keyboard.S);
+    leftkey = game.input.keyboard.addKey(Phaser.Keyboard.A);
+    rightkey = game.input.keyboard.addKey(Phaser.Keyboard.D);
+    
+    this.formerMouse = -1;
 
     jab1  = 2;
     jab2  = 1;
@@ -223,6 +220,7 @@ function move() {
             player.sword.position.y += speed*.2;
         }
     }
+
     //point sword forward
     player.sword.position.x -= (Math.sin(oldPlayerRotation) - Math.sin(player.rotation)) * minDistance; 
     player.sword.position.y += (Math.cos(oldPlayerRotation) - Math.cos(player.rotation)) * minDistance;  
