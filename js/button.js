@@ -25,12 +25,23 @@ function weaponButtonClicked () {
     selected = this;
 }
 
+function weaponButtonHovered () {
+    this.text.setStyle({boundsAlignH:'center', fontsize: 20});
+    this.text.setText(this.weaponsJSON.weapons[this.i].description);
+}
+
+function weaponButtonCleared () {
+    this.setText("Select a weapon.");
+}
+
+
 function playButtonClicked () {
+    selected = this;
     game.state.start('play');
 }
 
 myButton.prototype.update = function() {
-    if (this == selected) {
+    if (this == weaponbuttons[selected]) {
         this.buttontext.setStyle({fill: 'white'});
     }
     else {

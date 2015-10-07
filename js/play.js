@@ -27,7 +27,6 @@ function playCreate () {
     game.canvas.oncontextmenu = function (e) { e.preventDefault(); }
     //  A simple background for our game
     game.add.sprite(0, 0, 'sky');
-
     // the ground
 
     ground = game.add.sprite(game.world.width/2, game.world.height/2, 'boring-arena');
