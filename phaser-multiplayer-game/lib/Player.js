@@ -2,18 +2,28 @@
 ** GAME PLAYER CLASS
 ************************************************ */
 var Player = function (startX, startY) {
-  var x = startX
-  var y = startY
-  var id
+  var x = startX;
+  var y = startY;
+  var sx = startX;
+  var sy = startY;
+  var id;
   var r = 0;
 
   // Getters and setters
   var getX = function () {
-    return x
+    return x;
   }
 
   var getY = function () {
-    return y
+    return y;
+  }
+
+  var getSX = function () {
+    return sx;
+  }
+
+  var getSY = function () {
+    return sy;
   }
 
   var getR = function () {
@@ -21,11 +31,19 @@ var Player = function (startX, startY) {
   }
 
   var setX = function (newX) {
-    x = newX
+    x = newX;
   }
 
   var setY = function (newY) {
-    y = newY
+    y = newY;
+  }
+
+  var setSX = function (newSX) {
+    sx = newSX;
+  }
+
+  var setSY = function (newSY) {
+    sy = newSY;
   }
 
   var setR = function (newR) {
@@ -36,9 +54,13 @@ var Player = function (startX, startY) {
   return {
     getX: getX,
     getY: getY,
+    getSX: getSX,
+    getSY: getSY,
     getR: getR,
     setX: setX,
     setY: setY,
+    setSX: setSX,
+    setSY: setSY,
     setR: setR,
     id: id
   }

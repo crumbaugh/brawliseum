@@ -25,6 +25,13 @@ var RemotePlayer = function (index, game, player, startX, startY) {
 
   this.lastPosition = { x: x, y: y }
   this.player.rotation = 0;
+
+  this.player.sword = game.add.sprite(player.x, player.y, 'sword');
+  this.player.sword.rotation = -45;
+  this.player.sword.scale.setTo(.33,.33);
+  this.player.sword.anchor.setTo(0.5, 0.9);
+  this.player.sword.previousPosition = {x: x, y: y};  
+  this.player.sword.weight = 10;
 }
 
 RemotePlayer.prototype.update = function () {

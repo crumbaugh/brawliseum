@@ -4,8 +4,9 @@ var game = new Phaser.Game(800, 600, Phaser.AUTO, '', { preload: preload, create
 
 function preload () {
   game.load.image('earth', 'assets/light_sand.png')
-  game.load.image('dude', 'assets/dude.png', 64, 64)
-  game.load.image('enemy', 'assets/dude.png', 64, 64)
+  game.load.image('dude', 'assets/dude.png')
+  game.load.image('enemy', 'assets/dude.png')
+  game.load.image('sword', 'assets/sword.png')
 }
 
 var socket // Socket connection
@@ -34,6 +35,11 @@ function create () {
   var startY = Math.round(Math.random() * (1000) - 500)
   player = game.add.sprite(startX, startY, 'dude')
   player.anchor.setTo(0.5, 0.5)
+
+  player.sword = game.add.sprite(startX, startY, 'sword')
+  player.sword.rotation = -45;
+  player.sword.scale.setTo(.33,.33);
+  player.sword.anchor.setTo(0.5, 0.9);
 
   // This will force it to decelerate and limit its speed
   // player.body.drag.setTo(200, 200)
@@ -110,6 +116,9 @@ function onMovePlayer (data) {
   movePlayer.player.x = data.x
   movePlayer.player.y = data.y
   movePlayer.player.rotation = data.r
+  movePlayer.player.sword.position.x = data.sx
+  movePlayer.player.sword.position.y = data.sy
+
 }
 
 // Remove player
@@ -137,15 +146,19 @@ function update () {
   }
     if (leftkey.isDown){
       player.x -= player.speed;
+      player.sword.x -= player.speed;
     }
     if (rightkey.isDown){
       player.x += player.speed;
+      player.sword.x += player.speed;
     }
     if (upkey.isDown){
       player.y -= player.speed;
+      player.sword.y -= player.speed;
     }
     if (downkey.isDown){
       player.y += player.speed;
+      player.sword.y += player.speed;
     }
 
   land.tilePosition.x = -game.camera.x
@@ -153,7 +166,7 @@ function update () {
 
   player.rotation = game.physics.angleToPointer(player);
 
-  socket.emit('move player', { x: player.x, y: player.y, r: player.rotation })
+  socket.emit('move player', { x: player.x, y: player.y, r: player.rotation, sx: player.sword.position.x, sy: player.sword.position.y })
 }
 
 function render () {
