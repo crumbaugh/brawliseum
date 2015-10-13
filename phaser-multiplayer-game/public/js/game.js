@@ -20,6 +20,9 @@ var enemies
 var currentSpeed = 0
 var upkey, downkey, leftkey, rightkey;
 
+var maxDistance = 50;
+var minDistance = 35;
+
 function create () {
   socket = io.connect()
 
@@ -142,7 +145,6 @@ function update () {
   for (var i = 0; i < enemies.length; i++) {
     if (enemies[i].alive) {
       enemies[i].update()
-      game.physics.collide(player, enemies[i].player)
     }
   }
     if (leftkey.isDown){
@@ -165,7 +167,14 @@ function update () {
   land.tilePosition.x = -game.camera.x
   land.tilePosition.y = -game.camera.y
 
+  oldPlayerRotation = player.rotation;
+
   player.rotation = game.physics.angleToPointer(player);
+
+  player.sword.x -= (Math.sin(oldPlayerRotation) - Math.sin(player.rotation)) * minDistance; 
+  player.sword.y += (Math.cos(oldPlayerRotation) - Math.cos(player.rotation)) * minDistance;
+
+  player.sword.rotation = -game.math.angleBetween(player.sword.x, player.sword.y, player.x, player.y);
 
   socket.emit('move player', { x: player.x, y: player.y, r: player.rotation, sx: player.sword.x, sy: player.sword.y })
 }
