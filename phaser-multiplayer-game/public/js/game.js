@@ -36,7 +36,10 @@ function create () {
   player = game.add.sprite(startX, startY, 'dude')
   player.anchor.setTo(0.5, 0.5)
 
-
+  player.sword = game.add.sprite(startX, startY, 'sword')
+  player.sword.rotation = -45;
+  player.sword.scale.setTo(.33,.33);
+  player.sword.anchor.setTo(0.5, 0.9);
 
   // This will force it to decelerate and limit its speed
   // player.body.drag.setTo(200, 200)
