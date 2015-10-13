@@ -19,7 +19,7 @@ var RemotePlayer = function (index, game, player, startX, startY) {
   this.player.attacks = new Array(10);
   this.player.health = 1000;
   this.player.previousPosition = { x: x, y: y }; 
-  this.player.healthText = game.add.text(50, 50, 'Player health: ' + this.player.health, { fill: '#ffffff' });
+  this.player.healthText = game.add.text(x, y, 'Player health: ' + this.player.health, { fill: '#ffffff' });
   
   this.player.anchor.setTo(0.5, 0.5)
 

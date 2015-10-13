@@ -109,6 +109,7 @@ function onMovePlayer (data) {
   // Update player position
   movePlayer.player.x = data.x
   movePlayer.player.y = data.y
+  movePlayer.player.rotation = data.r
 }
 
 // Remove player
@@ -152,7 +153,7 @@ function update () {
 
   player.rotation = game.physics.angleToPointer(player);
 
-  socket.emit('move player', { x: player.x, y: player.y })
+  socket.emit('move player', { x: player.x, y: player.y, r: player.rotation })
 }
 
 function render () {
