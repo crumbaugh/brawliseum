@@ -132,6 +132,7 @@ function onRemovePlayer (data) {
   }
 
   removePlayer.player.kill()
+  removePlayer.player.sword.kill()
 
   // Remove player from array
   enemies.splice(enemies.indexOf(removePlayer), 1)
