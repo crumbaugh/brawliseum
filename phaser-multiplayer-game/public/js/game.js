@@ -150,13 +150,7 @@ function update () {
   land.tilePosition.x = -game.camera.x
   land.tilePosition.y = -game.camera.y
 
-  // if (game.input.activePointer.isDown) {
-  //   if (game.physics.distanceToPointer(player) >= 10) {
-  //     currentSpeed = 300
-
-  //     player.rotation = game.physics.angleToPointer(player)
-  //   }
-  // }
+  player.rotation = game.physics.angleToPointer(player);
 
   socket.emit('move player', { x: player.x, y: player.y })
 }
