@@ -86,7 +86,7 @@ function onSocketConnected () {
   console.log('Connected to socket server')
 
   // Send local player data to the game server
-  socket.emit('new player', { x: player.x, y: player.y, r: player.rotation })
+  socket.emit('new player', { x: player.x, y: player.y, r: player.rotation, sx: player.sword.x, sy: player.sword.y })
 }
 
 // Socket disconnected
@@ -116,8 +116,8 @@ function onMovePlayer (data) {
   movePlayer.player.x = data.x
   movePlayer.player.y = data.y
   movePlayer.player.rotation = data.r
-  movePlayer.player.sword.position.x = data.sx
-  movePlayer.player.sword.position.y = data.sy
+  movePlayer.player.sword.x = data.sx
+  movePlayer.player.sword.y = data.sy
 
 }
 
@@ -146,19 +146,19 @@ function update () {
   }
     if (leftkey.isDown){
       player.x -= player.speed;
-      player.sword.position.x -= player.speed;
+      player.sword.x -= player.speed;
     }
     if (rightkey.isDown){
       player.x += player.speed;
-      player.sword.position.x += player.speed;
+      player.sword.x += player.speed;
     }
     if (upkey.isDown){
       player.y -= player.speed;
-      player.sword.position.y -= player.speed;
+      player.sword.y -= player.speed;
     }
     if (downkey.isDown){
       player.y += player.speed;
-      player.sword.position.y += player.speed;
+      player.sword.y += player.speed;
     }
 
   land.tilePosition.x = -game.camera.x
@@ -166,7 +166,7 @@ function update () {
 
   player.rotation = game.physics.angleToPointer(player);
 
-  socket.emit('move player', { x: player.x, y: player.y, r: player.rotation, sx: player.sword.position.x, sy: player.sword.position.y })
+  socket.emit('move player', { x: player.x, y: player.y, r: player.rotation, sx: player.sword.x, sy: player.sword.y })
 }
 
 function render () {
