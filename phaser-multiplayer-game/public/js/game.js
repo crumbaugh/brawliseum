@@ -36,10 +36,7 @@ function create () {
   player = game.add.sprite(startX, startY, 'dude')
   player.anchor.setTo(0.5, 0.5)
 
-  player.sword = game.add.sprite(startX, startY, 'sword')
-  player.sword.rotation = -45;
-  player.sword.scale.setTo(.33,.33);
-  player.sword.anchor.setTo(0.5, 0.9);
+
 
   // This will force it to decelerate and limit its speed
   // player.body.drag.setTo(200, 200)
@@ -146,19 +143,19 @@ function update () {
   }
     if (leftkey.isDown){
       player.x -= player.speed;
-      player.sword.x -= player.speed;
+      player.sword.position.x -= player.speed;
     }
     if (rightkey.isDown){
       player.x += player.speed;
-      player.sword.x += player.speed;
+      player.sword.position.x += player.speed;
     }
     if (upkey.isDown){
       player.y -= player.speed;
-      player.sword.y -= player.speed;
+      player.sword.position.y -= player.speed;
     }
     if (downkey.isDown){
       player.y += player.speed;
-      player.sword.y += player.speed;
+      player.sword.position.y += player.speed;
     }
 
   land.tilePosition.x = -game.camera.x
