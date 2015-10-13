@@ -11,14 +11,14 @@ var RemotePlayer = function (index, game, player, startX, startY) {
   this.player.speed = 3;
   this.player = game.add.sprite(x, y, 'dude');
 
-
+  this.player.name = index.toString()
   this.player.currAttack = 0;
   this.player.attackFrame = 0;
   this.player.hit = 0;
   this.player.queuedAttack = 0;
   this.player.attacks = new Array(10);
   this.player.health = 1000;
-  this.player.previousPosition = new pair(this.player.x, this.player.y); 
+  this.player.previousPosition = { x: x, y: y }; 
   this.player.healthText = game.add.text(50, 50, 'Player health: ' + this.player.health, { fill: '#ffffff' });
   
   this.player.anchor.setTo(0.5, 0.5)
@@ -27,7 +27,6 @@ var RemotePlayer = function (index, game, player, startX, startY) {
 }
 
 RemotePlayer.prototype.update = function () {
-console.log(player.x);
   this.lastPosition.x = this.player.x
   this.lastPosition.y = this.player.y
 }
