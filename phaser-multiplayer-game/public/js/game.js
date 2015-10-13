@@ -39,8 +39,7 @@ function create () {
   player = game.add.sprite(startX, startY, 'dude')
   player.anchor.setTo(0.5, 0.5)
 
-  player.sword = game.add.sprite(startX, startY, 'sword')
-  player.sword.rotation = -45;
+  player.sword = game.add.sprite(startX + minDistance, startY, 'sword')
   player.sword.scale.setTo(.33,.33);
   player.sword.anchor.setTo(0.5, 0.9);
 
@@ -171,10 +170,10 @@ function update () {
 
   player.rotation = game.physics.angleToPointer(player);
 
-  player.sword.x -= (Math.sin(oldPlayerRotation) - Math.sin(player.rotation)) * minDistance; 
-  player.sword.y += (Math.cos(oldPlayerRotation) - Math.cos(player.rotation)) * minDistance;
+  player.sword.y -= (Math.sin(oldPlayerRotation) - Math.sin(player.rotation)) * minDistance; 
+  player.sword.x -= (Math.cos(oldPlayerRotation) - Math.cos(player.rotation)) * minDistance;
 
-  player.sword.rotation = -game.math.angleBetween(player.sword.x, player.sword.y, player.x, player.y);
+  player.sword.rotation = -3.14/2 + game.math.angleBetween(player.sword.x, player.sword.y, player.x, player.y);
 
   socket.emit('move player', { x: player.x, y: player.y, r: player.rotation, sx: player.sword.x, sy: player.sword.y })
 }
