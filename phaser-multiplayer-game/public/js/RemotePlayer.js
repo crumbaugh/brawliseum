@@ -24,6 +24,7 @@ var RemotePlayer = function (index, game, player, startX, startY) {
   this.player.anchor.setTo(0.5, 0.5)
 
   this.lastPosition = { x: x, y: y }
+  this.player.rotation = 0;
 }
 
 RemotePlayer.prototype.update = function () {
