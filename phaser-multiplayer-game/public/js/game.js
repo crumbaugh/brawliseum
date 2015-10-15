@@ -120,6 +120,7 @@ function onMovePlayer (data) {
   movePlayer.player.rotation = data.r
   movePlayer.player.sword.x = data.sx
   movePlayer.player.sword.y = data.sy
+  movePlayer.player.sword.rotation = data.sr
 
 }
 
