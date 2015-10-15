@@ -32,11 +32,24 @@ var RemotePlayer = function (index, game, player, startX, startY) {
   this.player.sword.anchor.setTo(0.5, 0.9);
   this.player.sword.previousPosition = {x: x, y: y + 35};  
   this.player.sword.weight = 10;
+  this.player.attacks[1] = generateAttack(2, 68, [[-20,2,20,1],[60,10,28,2],[5,20,20,0]],[[-1.5,20, 1],[3,28,1],[.2,20,0]],[[0,20],[90,28],[0,20]]);
+}
+
+var Attack;
+
+function createAttack(num, frames, movements, rotations, hitboxes) {
+    Attack = {};
+    Attack.attackNumber = num;
+    Attack.frames = frames;       //number of frames long the attack is
+    Attack.movements = movements; //2d array of length [frames] where each element is the x and y movements per frame
+    Attack.rotations = rotations; //array of length [frames] where each element is the number of radians it rotates that frame 
+    Attack.hitboxes = hitboxes;   //array of length [frames] where each element is the damage dealt on that frame 
+    return Attack;
 }
 
 RemotePlayer.prototype.update = function () {
-  this.lastPosition.x = this.player.x
-  this.lastPosition.y = this.player.y
+  // this.lastPosition.x = this.player.x
+  // this.lastPosition.y = this.player.y
 }
 
 window.RemotePlayer = RemotePlayer

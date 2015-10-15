@@ -13,12 +13,15 @@ var socket // Socket connection
 
 var land
 
+var returnTime = 8;
+var blockTime = 8;
+
 var player
 
 var enemies
 
 var currentSpeed = 0
-var upkey, downkey, leftkey, rightkey;
+var upkey, downkey, leftkey, rightkey, spacekey;
 
 var maxDistance = 50;
 var minDistance = 35;
@@ -38,11 +41,16 @@ function create () {
   var startY = Math.round(Math.random() * (1000) - 500)
   player = game.add.sprite(startX, startY, 'dude')
   player.anchor.setTo(0.5, 0.5)
+  player.currAttack = 0;
+  player.attackFrame = 0;
 
   player.sword = game.add.sprite(startX + minDistance, startY, 'sword')
   player.sword.scale.setTo(.33,.33);
   player.sword.anchor.setTo(0.5, 0.9);
-
+  player.hit = 0;
+  player.queuedAttack = 0;
+  player.attacks = new Array(10);
+  player.attacks[1] = generateAttack(2, 68, [[-20,2,20,1],[60,10,28,2],[5,20,20,0]],[[-1.5,20, 1],[3,28,1],[.2,20,0]],[[0,20],[90,28],[0,20]]);
   // This will force it to decelerate and limit its speed
   // player.body.drag.setTo(200, 200)
   player.body.maxVelocity.setTo(400, 400)
@@ -61,6 +69,10 @@ function create () {
   downkey = game.input.keyboard.addKey(Phaser.Keyboard.S);
   leftkey = game.input.keyboard.addKey(Phaser.Keyboard.A);
   rightkey = game.input.keyboard.addKey(Phaser.Keyboard.D);
+  spacekey = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
+
+  // var barConfig = {x: 200, y: 100};
+  // var myHealthBar = new HealthBar(game, barConfig);
 
   // Start listening for events
   setEventHandlers()
@@ -124,6 +136,110 @@ function onMovePlayer (data) {
 
 }
 
+function generateAttack(num, totalFrames, movements, rotations, hitboxes){
+    var currFrame = 0;
+    var i, j;
+    var tempMovements = new Array();
+    var tempRotations = new Array();
+    var tempHitboxes  = new Array();
+    for (i = 0; i < movements.length; i++) {
+        var frames = movements[i][2];
+        for (j = 1; j <= frames; j++) {
+            tempMovements[currFrame] = new Array(2);
+            if (movements[i][3] == 1) { //accelerated
+                var factor = j < frames - j + 1 ? j : frames - j + 1;
+                tempMovements[currFrame][0] = (factor)*(movements[i][0] / (2*triangleNumber(frames/2)));
+                tempMovements[currFrame][1] = (factor)*(movements[i][1] / (2*triangleNumber(frames/2)));
+            } else if (movements[i][3] == 0) { //standard 
+                tempMovements[currFrame][0] = movements[i][0] / frames;
+                tempMovements[currFrame][1] = movements[i][1] / frames;
+            } else if (movements[i][3] == 2) { //decelerated 
+                tempMovements[currFrame][0] = (frames - j + 1)*(movements[i][0] / (triangleNumber(frames)));
+                tempMovements[currFrame][1] = (frames - j + 1)*(movements[i][1] / (triangleNumber(frames)));
+            }
+            currFrame++;
+        }
+    }
+    currFrame = 0;
+    for (i = 0; i < rotations.length; i++) {
+        var frames = rotations[i][1];
+        for (j = 0; j < frames; j++) {
+            if (rotations[i][2]) { //accelerated
+                 var factor = j < frames - j + 1 ? j : frames - j + 1;
+                 tempRotations[currFrame] = (factor)*(rotations[i][0] / (2*triangleNumber(frames/2)));
+            } else {
+                tempRotations[currFrame] = rotations[i][0] / frames;
+            }    
+            currFrame++;
+        }
+    }
+    currFrame = 0;
+    for (i = 0; i < hitboxes.length; i++) {
+        var frames = hitboxes[i][1];
+        for (j = 0; j < frames; j++) {
+            tempHitboxes[currFrame] = hitboxes[i][0];
+            currFrame++;
+        }
+    }
+    
+    return createAttack(num, totalFrames, tempMovements, tempRotations, tempHitboxes);
+}
+
+function triangleNumber(n)
+{
+    return (n*n+n)/2;
+}
+
+// Attack function
+function attack(thisPlayer) {
+    //return sword
+    if (thisPlayer.currAttack == -1) {
+        if (thisPlayer.attackFrame == 0) {
+            //thisPlayer.sword.rotation %= 6.283;
+            //startingRotationDifference  = thisPlayer.sword.rotation   - thisPlayer.rotation;
+            startingPositionDifferenceX = (thisPlayer.x + Math.sin(thisPlayer.rotation)*minDistance) - thisPlayer.sword.x;
+            startingPositionDifferenceY = (thisPlayer.y - Math.cos(thisPlayer.rotation)*minDistance) - thisPlayer.sword.y;
+        }    
+        if (thisPlayer.attackFrame == returnTime) {
+            thisPlayer.currAttack = thisPlayer.queuedAttack;
+            thisPlayer.attackString = thisPlayer.queuedString;
+            thisPlayer.attackFrame = 0;
+            for (var i = 0; i < enemies.length; i++) {
+              if (enemies[i].alive) {
+                enemies[i].hit = 0;
+              }
+            }
+            return;
+        } else { //actually move the sword
+            //thisPlayer.sword.rotation   -= startingRotationDifference /returnTime;
+            thisPlayer.sword.x += startingPositionDifferenceX/returnTime;
+            thisPlayer.sword.y += startingPositionDifferenceY/returnTime;
+        }
+    } else {
+        if (thisPlayer.attackFrame >= thisPlayer.attacks[thisPlayer.currAttack].frames) { //end of attack
+            thisPlayer.queuedAttack = 0;
+            thisPlayer.attackString = "";
+            thisPlayer.queuedString = "";
+            thisPlayer.attackFrame = 0;
+            thisPlayer.currAttack = -1;
+            return;
+        }
+        var movementFrameData = thisPlayer.attacks[thisPlayer.currAttack].movements[thisPlayer.attackFrame];
+        thisPlayer.sword.x += Math.cos(thisPlayer.rotation)*movementFrameData[0] + Math.sin(thisPlayer.rotation)*movementFrameData[1];
+        thisPlayer.sword.y += Math.sin(thisPlayer.rotation)*movementFrameData[0] + Math.cos(thisPlayer.rotation)*movementFrameData[1];
+        //thisPlayer.sword.rotation   += thisPlayer.attacks[ thisPlayer.currAttack].rotations[thisPlayer.attackFrame];
+        
+        var distance = Math.sqrt(Math.pow(thisPlayer.sword.x - thisPlayer.x, 2) 
+                               + Math.pow(thisPlayer.sword.y - thisPlayer.y, 2));
+        if (distance > maxDistance) { //if the sword is too far away from its owner, move it to the max distance
+            thisPlayer.sword.x = thisPlayer.x + ((thisPlayer.sword.x - thisPlayer.x) / distance * maxDistance);   
+            thisPlayer.sword.y = thisPlayer.y + ((thisPlayer.sword.y - thisPlayer.y) / distance * maxDistance); 
+        }
+    }
+    thisPlayer.attackFrame++;
+    console.log("exit");
+}
+
 // Remove player
 function onRemovePlayer (data) {
   var removePlayer = playerById(data.id)
@@ -162,6 +278,17 @@ function update () {
     if (downkey.isDown){
       player.y += player.speed;
       player.sword.y += player.speed;
+    }
+
+    if (spacekey.isDown && player.currAttack != -1){ 
+      if (player.currAttack == 0) {
+          player.currAttack = 1;
+          player.attackString = "jab1";
+      }
+    }
+    if (player.currAttack != 0) {
+      console.log("ATTACK!");
+      attack(player);
     }
 
   land.tilePosition.x = -game.camera.x
