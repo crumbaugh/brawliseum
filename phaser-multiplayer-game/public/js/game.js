@@ -88,7 +88,7 @@ function onSocketConnected () {
   console.log('Connected to socket server')
 
   // Send local player data to the game server
-  socket.emit('new player', { x: player.x, y: player.y, r: player.rotation, sx: player.sword.x, sy: player.sword.y })
+  socket.emit('new player', { x: player.x, y: player.y, r: player.rotation, sx: player.sword.x, sy: player.sword.y, sr: player.sword.rotation })
 }
 
 // Socket disconnected
@@ -175,7 +175,7 @@ function update () {
 
   player.sword.rotation = -3.14/2 + game.math.angleBetween(player.sword.x, player.sword.y, player.x, player.y);
 
-  socket.emit('move player', { x: player.x, y: player.y, r: player.rotation, sx: player.sword.x, sy: player.sword.y })
+  socket.emit('move player', { x: player.x, y: player.y, r: player.rotation, sx: player.sword.x, sy: player.sword.y, sr: player.sword.rotation })
 }
 
 function render () {

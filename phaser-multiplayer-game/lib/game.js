@@ -97,13 +97,13 @@ function onNewPlayer (data) {
   newPlayer.id = this.id
 
   // Broadcast new player to connected socket clients
-  this.broadcast.emit('new player', {id: newPlayer.id, x: newPlayer.getX(), y: newPlayer.getY(), r: newPlayer.getR(), sx: newPlayer.getSX(), sy: newPlayer.getSY()})
+  this.broadcast.emit('new player', {id: newPlayer.id, x: newPlayer.getX(), y: newPlayer.getY(), r: newPlayer.getR(), sx: newPlayer.getSX(), sy: newPlayer.getSY(), sr: newPlayer.getSR()})
 
   // Send existing players to the new player
   var i, existingPlayer
   for (i = 0; i < players.length; i++) {
     existingPlayer = players[i]
-    this.emit('new player', {id: existingPlayer.id, x: existingPlayer.getX(), y: existingPlayer.getY(), r: existingPlayer.getR(), sx: existingPlayer.getSX(), sy: existingPlayer.getSY()})
+    this.emit('new player', {id: existingPlayer.id, x: existingPlayer.getX(), y: existingPlayer.getY(), r: existingPlayer.getR(), sx: existingPlayer.getSX(), sy: existingPlayer.getSY(), sr: existingPlayer.getSR()})
   }
 
   // Add new player to the players array
@@ -127,9 +127,10 @@ function onMovePlayer (data) {
   movePlayer.setSX(data.sx)
   movePlayer.setSY(data.sy)
   movePlayer.setR(data.r)
+  movePlayer.setSR(data.sr)
 
   // Broadcast updated position to connected socket clients
-  this.broadcast.emit('move player', {id: movePlayer.id, x: movePlayer.getX(), y: movePlayer.getY(), r: movePlayer.getR(), sx: movePlayer.getSX(), sy: movePlayer.getSY()})
+  this.broadcast.emit('move player', {id: movePlayer.id, x: movePlayer.getX(), y: movePlayer.getY(), r: movePlayer.getR(), sx: movePlayer.getSX(), sy: movePlayer.getSY(), sr: movePlayer.getSR()})
 }
 
 /* ************************************************
