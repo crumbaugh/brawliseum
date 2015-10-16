@@ -49,6 +49,10 @@ function create () {
   land = game.add.tileSprite(0, 0, 800, 600, 'earth')
   land.fixedToCamera = true
 
+  //Scoreboard stuff
+  scoreBoard = game.add.text(0, 0, 'Top Players:');
+  leaderboard = [['',0], ['',0], ['',0]];
+  
   // The base of our player
   var startX = Math.round(Math.random() * (1000) - 500)
   var startY = Math.round(Math.random() * (1000) - 500)
@@ -327,6 +331,10 @@ function update () {
 
   land.tilePosition.x = -game.camera.x
   land.tilePosition.y = -game.camera.y
+  
+  scoreBoard.x = game.camera.x + 10;
+  scoreBoard.y = game.camera.y + 10;
+  scoreBoard.setText('Top Players:\n1. ' + leaderboard[0][0] + '\n2.' + leaderboard[1][0] + '\n3.' + leaderboard[2][0]);
 
   oldPlayerRotation = player.rotation;
 
