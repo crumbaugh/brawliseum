@@ -32,7 +32,16 @@ var RemotePlayer = function (index, game, player, startX, startY) {
   this.player.sword.anchor.setTo(0.5, 0.9);
   this.player.sword.previousPosition = {x: x, y: y + 35};  
   this.player.sword.weight = 10;
-  this.player.attacks[1] = generateAttack(2, 68, [[-20,2,20,1],[60,10,28,2],[5,20,20,0]],[[-1.5,20, 1],[3,28,1],[.2,20,0]],[[0,20],[90,28],[0,20]]);
+  player.attacks[0] = createAttack(0, 0, [0,0],0,0);
+
+  player.attacks[1] = createAttack(1, 17, 
+  [[-2,.5],[-3,.5],[-2,.5],[-1,.5],[-.5,0],[-.5,0],[-.5,0], //windup
+   [0,0],[1,-.5],[2,-.5],[2,-.5],[3,0],[3,0],[3,0],[3,0],[3,0],[3,0],[3,0],[2,.5],[2,.5],[1,.5],[1,.5],[.5,.5],[0,.5]], //swing 
+  [-.05,-.1,-.15,-.2,-.15,-.15,.1,0,.05,.75,.1,.125,.15,.175,.2,.175,.15,.1],//rotations
+  [0,0,0,0,0,0,0,15,25,40,100,100,40,25,20,15,10]); //hitboxes
+
+  player.attacks[2] = generateAttack(2, 68, [[-20,2,20,1],[60,10,28,2],[5,20,20,0]],[[-1.5,20, 1],[3,28,1],[.2,20,0]],[[0,20],[90,28],[0,20]]);
+  player.attacks[3] = generateAttack(3, blockTime, [[-20,-20,blockTime-3,0],[0,0,3,0]],[[3.14/2,blockTime - 2,1],[0,2,0]],[[0,blockTime - 2],[0,2]]);
 }
 
 var Attack;

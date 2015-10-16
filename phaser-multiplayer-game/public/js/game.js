@@ -26,6 +26,8 @@ var upkey, downkey, leftkey, rightkey, spacekey;
 var maxDistance = 50;
 var minDistance = 35;
 
+var preferredAttack = 1;
+
 function create () {
   socket = io.connect()
 
@@ -50,7 +52,17 @@ function create () {
   player.hit = 0;
   player.queuedAttack = 0;
   player.attacks = new Array(10);
-  player.attacks[1] = generateAttack(2, 68, [[-20,2,20,1],[60,10,28,2],[5,20,20,0]],[[-1.5,20, 1],[3,28,1],[.2,20,0]],[[0,20],[90,28],[0,20]]);
+  player.attacks[0] = createAttack(0, 0, [0,0],0,0);
+
+  player.attacks[1] = createAttack(1, 17, 
+  [[-2,.5],[-3,.5],[-2,.5],[-1,.5],[-.5,0],[-.5,0],[-.5,0], //windup
+   [0,0],[1,-.5],[2,-.5],[2,-.5],[3,0],[3,0],[3,0],[3,0],[3,0],[3,0],[3,0],[2,.5],[2,.5],[1,.5],[1,.5],[.5,.5],[0,.5]], //swing 
+  [-.05,-.1,-.15,-.2,-.15,-.15,.1,0,.05,.75,.1,.125,.15,.175,.2,.175,.15,.1],//rotations
+  [0,0,0,0,0,0,0,15,25,40,100,100,40,25,20,15,10]); //hitboxes
+
+  player.attacks[2] = generateAttack(2, 68, [[-20,2,20,1],[60,10,28,2],[5,20,20,0]],[[-1.5,20, 1],[3,28,1],[.2,20,0]],[[0,20],[90,28],[0,20]]);
+  player.attacks[3] = generateAttack(3, blockTime, [[-20,-20,blockTime-3,0],[0,0,3,0]],[[3.14/2,blockTime - 2,1],[0,2,0]],[[0,blockTime - 2],[0,2]]);
+
   // This will force it to decelerate and limit its speed
   // player.body.drag.setTo(200, 200)
   player.body.maxVelocity.setTo(400, 400)
@@ -69,6 +81,9 @@ function create () {
   downkey = game.input.keyboard.addKey(Phaser.Keyboard.S);
   leftkey = game.input.keyboard.addKey(Phaser.Keyboard.A);
   rightkey = game.input.keyboard.addKey(Phaser.Keyboard.D);
+  onekey = game.input.keyboard.addKey(Phaser.Keyboard.ONE);
+  twokey = game.input.keyboard.addKey(Phaser.Keyboard.TWO);
+  threekey = game.input.keyboard.addKey(Phaser.Keyboard.THREE);
   spacekey = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
 
   // var barConfig = {x: 200, y: 100};
@@ -227,8 +242,8 @@ function attack(thisPlayer) {
         var movementFrameData = thisPlayer.attacks[thisPlayer.currAttack].movements[thisPlayer.attackFrame];
         thisPlayer.sword.x += Math.cos(thisPlayer.rotation)*movementFrameData[0] + Math.sin(thisPlayer.rotation)*movementFrameData[1];
         thisPlayer.sword.y += Math.sin(thisPlayer.rotation)*movementFrameData[0] + Math.cos(thisPlayer.rotation)*movementFrameData[1];
-        //thisPlayer.sword.rotation   += thisPlayer.attacks[ thisPlayer.currAttack].rotations[thisPlayer.attackFrame];
-        
+        // thisPlayer.sword.rotation   += thisPlayer.attacks[ thisPlayer.currAttack].rotations[thisPlayer.attackFrame];
+
         var distance = Math.sqrt(Math.pow(thisPlayer.sword.x - thisPlayer.x, 2) 
                                + Math.pow(thisPlayer.sword.y - thisPlayer.y, 2));
         if (distance > maxDistance) { //if the sword is too far away from its owner, move it to the max distance
@@ -237,7 +252,6 @@ function attack(thisPlayer) {
         }
     }
     thisPlayer.attackFrame++;
-    console.log("exit");
 }
 
 // Remove player
@@ -279,15 +293,21 @@ function update () {
       player.y += player.speed;
       player.sword.y += player.speed;
     }
-
+    if (onekey.isDown){
+      preferredAttack = 1;
+    }
+    if (twokey.isDown){
+      preferredAttack = 2;
+    }
+    if (threekey.isDown){
+      preferredAttack = 3;
+    }
     if (spacekey.isDown && player.currAttack != -1){ 
       if (player.currAttack == 0) {
-          player.currAttack = 1;
-          player.attackString = "jab1";
+          player.currAttack = preferredAttack;
       }
     }
     if (player.currAttack != 0) {
-      console.log("ATTACK!");
       attack(player);
     }
 
