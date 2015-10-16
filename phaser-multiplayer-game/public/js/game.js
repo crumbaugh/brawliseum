@@ -7,11 +7,15 @@ function preload () {
   game.load.image('dude', 'assets/dude.png')
   game.load.image('enemy', 'assets/dude.png')
   game.load.image('sword', 'assets/sword.png')
+
+  game.load.audio('theme', '../theme.mp3');
 }
 
 var socket // Socket connection
 
 var land
+
+var music // audio
 
 var returnTime = 8;
 var blockTime = 8;
@@ -30,6 +34,10 @@ var preferredAttack = 1;
 
 function create () {
   socket = io.connect()
+
+  music = game.add.audio('theme');
+
+  music.play();
 
   // Resize our game world to be a 2000 x 2000 square
   game.world.setBounds(-500, -500, 1000, 1000)
