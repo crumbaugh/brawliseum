@@ -9,22 +9,24 @@ function preload () {
   game.load.image('sword', 'assets/sword.png')
 
   game.load.audio('theme', '../theme.mp3');
+  game.load.audio('swing', '../swordswing.mp3');
 }
 
-var socket // Socket connection
+var socket; // Socket connection
 
-var land
+var land;
 
-var music // audio
+var music; // audio
+var swing_effect;
 
 var returnTime = 8;
 var blockTime = 8;
 
-var player
+var player;
 
-var enemies
+var enemies;
 
-var currentSpeed = 0
+var currentSpeed = 0;
 var upkey, downkey, leftkey, rightkey, spacekey;
 
 var maxDistance = 50;
@@ -36,6 +38,7 @@ function create () {
   socket = io.connect()
 
   music = game.add.audio('theme');
+  swing_effect = game.add.audion('swing');
 
   music.play();
 
@@ -239,6 +242,9 @@ function attack(thisPlayer) {
             thisPlayer.sword.y += startingPositionDifferenceY/returnTime;
         }
     } else {
+        if (thisPlayer.attackFrame == 0) {
+          swing_effect.play();
+        }
         if (thisPlayer.attackFrame >= thisPlayer.attacks[thisPlayer.currAttack].frames) { //end of attack
             thisPlayer.queuedAttack = 0;
             thisPlayer.attackString = "";
