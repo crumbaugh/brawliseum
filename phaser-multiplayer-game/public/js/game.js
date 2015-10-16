@@ -56,7 +56,7 @@ function create () {
   player.anchor.setTo(0.5, 0.5)
   player.currAttack = 0;
   player.attackFrame = 0;
-
+  player.speed = 3;
   player.sword = game.add.sprite(startX + minDistance, startY, 'sword')
   player.sword.scale.setTo(.33,.33);
   player.sword.anchor.setTo(0.5, 0.9);
