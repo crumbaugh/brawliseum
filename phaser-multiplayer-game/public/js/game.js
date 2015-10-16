@@ -38,7 +38,7 @@ function create () {
   socket = io.connect()
 
   music = game.add.audio('theme');
-  swing_effect = game.add.audion('swing');
+  swing_effect = game.add.audio('swing');
 
   music.play();
 
