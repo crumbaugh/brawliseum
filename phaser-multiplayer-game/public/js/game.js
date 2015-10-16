@@ -220,8 +220,8 @@ function attack(thisPlayer) {
         if (thisPlayer.attackFrame == 0) {
             //thisPlayer.sword.rotation %= 6.283;
             //startingRotationDifference  = thisPlayer.sword.rotation   - thisPlayer.rotation;
-            startingPositionDifferenceX = (thisPlayer.x + Math.sin(thisPlayer.rotation)*minDistance) - thisPlayer.sword.x;
-            startingPositionDifferenceY = (thisPlayer.y - Math.cos(thisPlayer.rotation)*minDistance) - thisPlayer.sword.y;
+            startingPositionDifferenceX = (thisPlayer.x + Math.sin(thisPlayer.rotation - 30)*minDistance) - thisPlayer.sword.x;
+            startingPositionDifferenceY = (thisPlayer.y - Math.cos(thisPlayer.rotation - 30)*minDistance) - thisPlayer.sword.y;
         }    
         if (thisPlayer.attackFrame == returnTime) {
             thisPlayer.currAttack = thisPlayer.queuedAttack;
@@ -248,8 +248,8 @@ function attack(thisPlayer) {
             return;
         }
         var movementFrameData = thisPlayer.attacks[thisPlayer.currAttack].movements[thisPlayer.attackFrame];
-        thisPlayer.sword.x += Math.cos(thisPlayer.rotation)*movementFrameData[0] + Math.sin(thisPlayer.rotation)*movementFrameData[1];
-        thisPlayer.sword.y += Math.sin(thisPlayer.rotation)*movementFrameData[0] + Math.cos(thisPlayer.rotation)*movementFrameData[1];
+        thisPlayer.sword.x += Math.cos(thisPlayer.rotation - 30)*movementFrameData[0] + Math.sin(thisPlayer.rotation)*movementFrameData[1];
+        thisPlayer.sword.y += Math.sin(thisPlayer.rotation - 30)*movementFrameData[0] + Math.cos(thisPlayer.rotation)*movementFrameData[1];
         // thisPlayer.sword.rotation   += thisPlayer.attacks[ thisPlayer.currAttack].rotations[thisPlayer.attackFrame];
 
         var distance = Math.sqrt(Math.pow(thisPlayer.sword.x - thisPlayer.x, 2) 
