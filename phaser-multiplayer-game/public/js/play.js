@@ -7,6 +7,7 @@ function playPreload () {
   game.load.image('dude', 'assets/dude.png')
   game.load.image('enemy', 'assets/dude.png')
   game.load.image('sword', 'assets/sword.png')
+  game.load.image('healthbar', 'assets/healthbar.png');
 
   game.load.audio('theme', '../theme.mp3');
   game.load.audio('swing', '../swordswing.mp3');
@@ -78,6 +79,14 @@ function playCreate () {
 
   player.attacks[2] = generateAttack(2, 68, [[-20,2,20,1],[60,10,28,2],[5,20,20,0]],[[-1.5,20, 1],[3,28,1],[.2,20,0]],[[0,20],[90,28],[0,20]]);
   player.attacks[3] = generateAttack(3, blockTime, [[-20,-20,blockTime-3,0],[0,0,3,0]],[[3.14/2,blockTime - 2,1],[0,2,0]],[[0,blockTime - 2],[0,2]]);
+
+  player.health = 1000;
+  player.maxHealth = 1000;
+
+  player.healthbar = this.game.add.sprite(startX - 35, startY - 50,'healthbar');
+  player.healthbar.cropEnabled = true;
+  player.healthbar.scale.setTo(.75,.75);
+  player.healthbar.crop.width = (player.health / player.maxHealth) * player.healthbar.width;
 
   // This will force it to decelerate and limit its speed
   // player.body.drag.setTo(200, 200)
@@ -164,6 +173,8 @@ function onMovePlayer (data) {
   movePlayer.player.sword.x = data.sx
   movePlayer.player.sword.y = data.sy
   movePlayer.player.sword.rotation = data.sr
+  movePlayer.player.healthbar.x = data.x - 35;
+  movePlayer.player.healthbar.y = data.y - 50;
 
 }
 
@@ -299,18 +310,22 @@ function playUpdate () {
     if (leftkey.isDown){
       player.x -= player.speed;
       player.sword.x -= player.speed;
+      player.healthbar.x -= player.speed;
     }
     if (rightkey.isDown){
       player.x += player.speed;
       player.sword.x += player.speed;
+      player.healthbar.x += player.speed;
     }
     if (upkey.isDown){
       player.y -= player.speed;
       player.sword.y -= player.speed;
+      player.healthbar.y -= player.speed;
     }
     if (downkey.isDown){
       player.y += player.speed;
       player.sword.y += player.speed;
+      player.healthbar.y += player.speed;
     }
     if (onekey.isDown){
       preferredAttack = 1;
