@@ -171,6 +171,14 @@ function onMovePlayer (data) {
   movePlayer.player.healthbar.x = data.x - 35;
   movePlayer.player.healthbar.y = data.y - 50;
 
+
+  // var boundsA = movePlayer.player.getBounds();
+  // var boundsB = player.getBounds();
+  // if (Phaser.Rectangle.intersects(boundsA, boundsB)) {
+    movePlayer.player.health-=1;
+    movePlayer.player.healthbar.crop.width = (movePlayer.player.health / movePlayer.player.maxHealth) * movePlayer.player.healthbar.width;
+  // }
+
 }
 
 function generateAttack(num, totalFrames, movements, rotations, hitboxes){
@@ -280,6 +288,23 @@ function attack(thisPlayer) {
     thisPlayer.attackFrame++;
 }
 
+// TODO for tomorrow: THIS.
+// function checkCollisions(){
+//     if ((player.currAttack > 0 || enemy.currAttack > 0) //if someone is attacking 
+//          && player.currAttack != 6 && enemy.currAttack != 6 && player.currAttack != -1 && enemy.currAttack != -1 //and neither is already in knockback
+//          && checkOverlap(player.sword, enemy.sword)) { //and the swords are touching
+//             collide(player.sword, enemy.sword);    
+//     }
+//     if (player.currAttack > 0 && checkOverlap(player.sword, enemy) && player.attacks[player.currAttack].hitboxes[player.attackFrame] != 0 && !enemy.hit) {
+//         enemy.hit = 1;
+//         var damage = game.add.text(enemy.position.x + 30*(Math.random()-.5), enemy.position.y + 30*(Math.random()-.5),
+//                                    player.attacks[player.currAttack].hitboxes[player.attackFrame]);
+//         game.add.tween(damage).to({alpha: 0}, 1000, Phaser.Easing.Linear.None, true);
+//         enemy.health -= player.attacks[player.currAttack].hitboxes[player.attackFrame];
+//         enemy.healthText.text = 'Enemy health: ' + enemy.health;
+//     } 
+// }
+
 // Remove player
 function onRemovePlayer (data) {
   var removePlayer = playerById(data.id)
@@ -292,6 +317,7 @@ function onRemovePlayer (data) {
 
   removePlayer.player.kill()
   removePlayer.player.sword.kill()
+  removePlayer.player.healthbar.kill()
 
   // Remove player from array
   enemies.splice(enemies.indexOf(removePlayer), 1)
