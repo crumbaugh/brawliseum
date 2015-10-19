@@ -4,8 +4,8 @@ var playState = { preload: playPreload, create: playCreate, update: playUpdate, 
 
 function playPreload () {
   game.load.image('earth', 'assets/light_sand.png')
-  game.load.image('dude', 'assets/dude.png')
-  game.load.image('enemy', 'assets/dude.png')
+  game.load.image('dude', 'assets/blue.png')
+  game.load.image('enemy', 'assets/red.png')
   game.load.image('sword', 'assets/sword.png')
   game.load.image('healthbar', 'assets/healthbar.png');
 
@@ -58,7 +58,7 @@ function playCreate () {
   // The base of our player
   var startX = Math.round(Math.random() * (1000) - 500)
   var startY = Math.round(Math.random() * (1000) - 500)
-  player = game.add.sprite(startX, startY, 'dude')
+  player = game.add.sprite(startX, startY, 'blue')
   player.anchor.setTo(0.5, 0.5)
   player.currAttack = 0;
   player.attackFrame = 0;
