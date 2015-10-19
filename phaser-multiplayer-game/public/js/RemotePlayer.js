@@ -9,7 +9,7 @@ var RemotePlayer = function (index, game, player, startX, startY) {
   this.player = player
   this.alive = true
   this.player.speed = 3;
-  this.player = game.add.sprite(x, y, 'blue');
+  this.player = game.add.sprite(x, y, 'dude');
 
   this.player.name = index.toString()
   this.player.currAttack = 0;

@@ -58,7 +58,7 @@ function playCreate () {
   // The base of our player
   var startX = Math.round(Math.random() * (1000) - 500)
   var startY = Math.round(Math.random() * (1000) - 500)
-  player = game.add.sprite(startX, startY, 'blue')
+  player = game.add.sprite(startX, startY, 'dude')
   player.anchor.setTo(0.5, 0.5)
   player.currAttack = 0;
   player.attackFrame = 0;
