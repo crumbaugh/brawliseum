@@ -1,0 +1,23 @@
+{ "stages" : [
+        {
+           "name": "Desert",
+           "description": "Hot!",
+           "image": "N/A"
+       },
+       {
+            "name": "Tundra",
+            "description": "Brr!",
+            "image": "N/A"
+        },
+        {
+            "name": "Ocean",
+            "description": "Glug.",
+            "image": "N/A"
+        },
+        {
+            "name": "Road",
+            "description": "Yeehaw!",
+            "image": "N/A"
+        }
+    ]
+}

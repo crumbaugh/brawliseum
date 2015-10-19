@@ -18,8 +18,8 @@ var RemotePlayer = function (index, game, player, startX, startY) {
   this.player.queuedAttack = 0;
   this.player.attacks = new Array(10);
   this.player.health = 1000;
+  this.player.maxHealth = 1000;
   this.player.previousPosition = { x: x, y: y }; 
-  this.player.healthText = game.add.text(x, y, 'Player health: ' + this.player.health, { fill: '#ffffff' });
   
   this.player.anchor.setTo(0.5, 0.5)
 
@@ -32,6 +32,13 @@ var RemotePlayer = function (index, game, player, startX, startY) {
   this.player.sword.anchor.setTo(0.5, 0.9);
   this.player.sword.previousPosition = {x: x, y: y + 35};  
   this.player.sword.weight = 10;
+  
+
+  this.player.healthbar = game.add.sprite(x - 35, y - 50,'healthbar');
+  this.player.healthbar.cropEnabled = true;
+  this.player.healthbar.scale.setTo(.75,.75);
+  this.player.healthbar.crop.width = (this.player.health / this.player.maxHealth) * this.player.healthbar.width;
+
   player.attacks[0] = createAttack(0, 0, [0,0],0,0);
 
   player.attacks[1] = createAttack(1, 17, 
