@@ -171,19 +171,19 @@ function onMovePlayer (data) {
   movePlayer.player.healthbar.x = data.x - 35;
   movePlayer.player.healthbar.y = data.y - 50;
   movePlayer.player.health = data.h;
-  movePlayer.player.healthbar.crop.width = (movePlayer.player.health / movePlayer.player.maxHealth) * movePlayer.player.healthbar.width;
 
   if (data.attack) {
     var boundsA = movePlayer.player.sword.bounds;
     var boundsB = player.bounds;
     if (Phaser.Rectangle.intersects(boundsA, boundsB)) {
       console.log("ONE");
-      player.health-=1;
-      // player.healthbar.crop.width = (player.health / player.maxHealth) * player.healthbar.width;
+      movePlayer.player.health-=1;
     } else {
       console.log("TWO");
     }
   }
+  movePlayer.player.healthbar.crop.width = (movePlayer.player.health / movePlayer.player.maxHealth) * movePlayer.player.healthbar.width;
+
 
 }
 

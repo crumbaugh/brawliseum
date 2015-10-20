@@ -37,7 +37,6 @@ var RemotePlayer = function (index, game, player, startX, startY) {
   this.player.healthbar = game.add.sprite(x - 35, y - 50,'healthbar');
   this.player.healthbar.cropEnabled = true;
   this.player.healthbar.scale.setTo(.75,.75);
-  this.player.healthbar.crop.width = (this.player.health / this.player.maxHealth) * this.player.healthbar.width;
 
   player.attacks[0] = createAttack(0, 0, [0,0],0,0);
 
