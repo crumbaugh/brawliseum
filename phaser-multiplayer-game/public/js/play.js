@@ -176,11 +176,7 @@ function onMovePlayer (data) {
     var boundsA = movePlayer.player.sword.bounds;
     var boundsB = player.bounds;
     if (Phaser.Rectangle.intersects(boundsA, boundsB)) {
-      console.log(player.health);
-      console.log(movePlayer.player.health);
       player.health-=1;
-      console.log(player.health);
-      console.log(movePlayer.player.health);
     }
 
   }
@@ -376,6 +372,10 @@ function playUpdate () {
     }
 
   player.healthbar.scale.setTo(.75 * (player.health / player.maxHealth), .75);
+
+  for (var i = 0; i < enemies.length; i++) {
+      enemies[i].player.healthbar.scale.setTo(.75 * (enemies[i].player.health / enemies[i].player.maxHealth), .75);
+  }
 
   land.tilePosition.x = -game.camera.x
   land.tilePosition.y = -game.camera.y
