@@ -172,12 +172,12 @@ function onMovePlayer (data) {
   movePlayer.player.healthbar.y = data.y - 50;
 
   if (data.attack) {
-    var boundsX1 = movePlayer.player.sword.position.x;
-    var border1 = movePlayer.player.sword.width;
-    // if (Phaser.Rectangle.intersects(boundsA, boundsB)) {
+    var boundsA = movePlayer.player.sword.bounds;
+    var boundsB = player.bounds;
+    if (Phaser.Rectangle.intersects(boundsA, boundsB)) {
       player.health-=1;
-      movePlayer.player.healthbar.crop.width = (movePlayer.player.health / movePlayer.player.maxHealth) * movePlayer.player.healthbar.width;
-    // }
+      player.healthbar.crop.width = (player.health / player.maxHealth) * player.healthbar.width;
+    }
   }
 
 }
