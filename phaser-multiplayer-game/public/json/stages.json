@@ -1,0 +1,23 @@
+{ "stages" : [
+        {
+           "name": "Desert",
+           "description": "Hot!",
+           "image": "assets/light_sand.png"
+       },
+       {
+            "name": "Grass",
+            "description": "Grassy?",
+            "image": "assets/light_grass.png"
+        },
+        {
+            "name": "Ice",
+            "description": "Not Hot!",
+            "image": "assets/ice.png"
+        },
+        {
+            "name": "Earth",
+            "description": "Hardcore",
+            "image": "assets/scorched_earth.png"
+        }
+    ]
+}
