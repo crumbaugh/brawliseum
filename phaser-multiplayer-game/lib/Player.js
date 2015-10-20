@@ -10,6 +10,7 @@ var Player = function (startX, startY) {
   var id;
   var r = 0;
   var sr = 0;
+  var hits = 0;
 
   // Getters and setters
   var getX = function () {
@@ -40,6 +41,10 @@ var Player = function (startX, startY) {
     return h;
   }
 
+  var getHits = function() {
+    return hits;
+  }
+
   var setX = function (newX) {
     x = newX;
   }
@@ -68,6 +73,10 @@ var Player = function (startX, startY) {
     h = newHealth;
   }
 
+  var setHits = function (newHits) {
+    hits = newHits;
+  }
+
   // Define which variables and methods can be accessed
   return {
     getX: getX,
@@ -77,6 +86,7 @@ var Player = function (startX, startY) {
     getR: getR,
     getSR: getSR,
     getH: getH,
+    getHits: getHits,
     setX: setX,
     setY: setY,
     setSX: setSX,
@@ -84,6 +94,7 @@ var Player = function (startX, startY) {
     setR: setR,
     setSR: setSR,
     setH: setH,
+    setHits: setHits,
     id: id
   }
 }

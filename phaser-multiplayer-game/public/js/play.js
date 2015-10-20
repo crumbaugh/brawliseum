@@ -62,6 +62,7 @@ function playCreate () {
   player.anchor.setTo(0.5, 0.5)
   player.currAttack = 0;
   player.attackFrame = 0;
+  player.hitcount = 0;
   player.speed = 3;
   player.sword = game.add.sprite(startX + minDistance, startY, 'sword')
   player.sword.scale.setTo(.33,.33);
@@ -173,9 +174,7 @@ function onMovePlayer (data) {
     var boundsB = player.bounds;
     if (Phaser.Rectangle.intersects(boundsA, boundsB)) {
       player.health-=1;
-      movePlayer.player.hitcount++;
     }
-
   }
 
 }
@@ -364,6 +363,13 @@ function playUpdate () {
 
   for (var i = 0; i < enemies.length; i++) {
       enemies[i].player.healthbar.scale.setTo(.75 * (enemies[i].player.health / enemies[i].player.maxHealth), .75);
+      if (player.currAttack != 0) {
+          var boundsA = player.sword.bounds;
+          var boundsB = enemies[i].player.bounds;
+          if (Phaser.Rectangle.intersects(boundsA, boundsB)) {
+            player.hitcount++;
+          }
+      }
   }
 
   land.tilePosition.x = -game.camera.x
@@ -389,7 +395,7 @@ function playUpdate () {
 
   player.sword.rotation = -3.14/2 + game.math.angleBetween(player.sword.x, player.sword.y, player.x, player.y);
 
-  socket.emit('move player', { x: player.x, y: player.y, r: player.rotation, sx: player.sword.x, sy: player.sword.y, sr: player.sword.rotation, attack: attacking, h: player.health })
+  socket.emit('move player', { x: player.x, y: player.y, r: player.rotation, sx: player.sword.x, sy: player.sword.y, sr: player.sword.rotation, attack: attacking, h: player.health, hits: player.hitcount })
 }
 
 function playRender () {
