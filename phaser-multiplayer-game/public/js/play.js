@@ -377,13 +377,6 @@ function playUpdate () {
 
   player.healthbar.crop.width = (player.health / player.maxHealth) * player.healthbar.width;
 
-  for (var i = 0; i < enemies.length; i++) {
-    if (enemies[i].alive) {
-      var n_m_e = enemies[i];
-      n_m_e.healthbar.crop.width = (n_m_e.health / n_m_e.maxHealth) * n_m_e.healthbar.width;
-    }
-  }
-
   land.tilePosition.x = -game.camera.x
   land.tilePosition.y = -game.camera.y
   
