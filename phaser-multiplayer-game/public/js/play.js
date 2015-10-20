@@ -375,7 +375,7 @@ function playUpdate () {
       attacking = true;
     }
 
-  player.healthbar.crop.width = (player.health / player.maxHealth) * player.healthbar.width;
+  player.healthbar.scale.setTo(.75 * (player.health / player.maxHealth), .75);
 
   land.tilePosition.x = -game.camera.x
   land.tilePosition.y = -game.camera.y
