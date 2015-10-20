@@ -3,7 +3,7 @@
 var playState = { preload: playPreload, create: playCreate, update: playUpdate, render: playRender };
 
 function playPreload () {
-  game.load.image('earth', 'assets/light_sand.png')
+  game.load.image('earth', stageselected)
   game.load.image('dude', 'assets/blue.png')
   game.load.image('enemy', 'assets/red.png')
   game.load.image('sword', 'assets/sword.png')
