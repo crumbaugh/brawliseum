@@ -326,6 +326,10 @@ function onRemovePlayer (data) {
 }
 
 function playUpdate () {
+  if (player.health <= 0) {
+    socket.emit('remove player', { id: player.name });
+    game.state.start('menu');
+  }
   var attacking = false;
   for (var i = 0; i < enemies.length; i++) {
     if (enemies[i].alive) {
