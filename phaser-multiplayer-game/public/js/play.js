@@ -177,9 +177,11 @@ function onMovePlayer (data) {
     var boundsA = movePlayer.player.sword.bounds;
     var boundsB = player.bounds;
     if (Phaser.Rectangle.intersects(boundsA, boundsB)) {
+      console.log(player.health);
       console.log(movePlayer.player.health);
       player.health-=1;
       player.healthbar.crop.width = (player.health / player.maxHealth) * player.healthbar.width;
+      console.log(player.health);
       console.log(movePlayer.player.health);
     }
 
