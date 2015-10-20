@@ -130,7 +130,7 @@ function onMovePlayer (data) {
   movePlayer.setSR(data.sr)
 
   // Broadcast updated position to connected socket clients
-  this.broadcast.emit('move player', {id: movePlayer.id, x: movePlayer.getX(), y: movePlayer.getY(), r: movePlayer.getR(), sx: movePlayer.getSX(), sy: movePlayer.getSY(), sr: movePlayer.getSR()})
+  this.broadcast.emit('move player', {id: movePlayer.id, x: movePlayer.getX(), y: movePlayer.getY(), r: movePlayer.getR(), sx: movePlayer.getSX(), sy: movePlayer.getSY(), sr: movePlayer.getSR(), attack: data.attack})
 }
 
 /* ************************************************

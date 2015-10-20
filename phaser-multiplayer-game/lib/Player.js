@@ -31,7 +31,7 @@ var Player = function (startX, startY) {
     return r;
   }
 
-  var getSR = function (newR) {
+  var getSR = function () {
     return sr;
   }
 

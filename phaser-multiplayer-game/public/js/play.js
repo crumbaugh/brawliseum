@@ -171,13 +171,14 @@ function onMovePlayer (data) {
   movePlayer.player.healthbar.x = data.x - 35;
   movePlayer.player.healthbar.y = data.y - 50;
 
-
-  // var boundsA = movePlayer.player.getBounds();
-  // var boundsB = player.getBounds();
-  // if (Phaser.Rectangle.intersects(boundsA, boundsB)) {
-    movePlayer.player.health-=1;
-    movePlayer.player.healthbar.crop.width = (movePlayer.player.health / movePlayer.player.maxHealth) * movePlayer.player.healthbar.width;
-  // }
+  if (data.attack) {
+    var boundsX1 = movePlayer.player.sword.position.x;
+    var border1 = movePlayer.player.sword.width;
+    // if (Phaser.Rectangle.intersects(boundsA, boundsB)) {
+      player.health-=1;
+      movePlayer.player.healthbar.crop.width = (movePlayer.player.health / movePlayer.player.maxHealth) * movePlayer.player.healthbar.width;
+    // }
+  }
 
 }
 
@@ -324,6 +325,7 @@ function onRemovePlayer (data) {
 }
 
 function playUpdate () {
+  var attacking = false;
   for (var i = 0; i < enemies.length; i++) {
     if (enemies[i].alive) {
       enemies[i].update()
@@ -365,6 +367,7 @@ function playUpdate () {
     }
     if (player.currAttack != 0) {
       attack(player);
+      attacking = true;
     }
 
   land.tilePosition.x = -game.camera.x
@@ -383,7 +386,7 @@ function playUpdate () {
 
   player.sword.rotation = -3.14/2 + game.math.angleBetween(player.sword.x, player.sword.y, player.x, player.y);
 
-  socket.emit('move player', { x: player.x, y: player.y, r: player.rotation, sx: player.sword.x, sy: player.sword.y, sr: player.sword.rotation })
+  socket.emit('move player', { x: player.x, y: player.y, r: player.rotation, sx: player.sword.x, sy: player.sword.y, sr: player.sword.rotation, attack: attacking })
 }
 
 function playRender () {
