@@ -327,13 +327,14 @@ function onRemovePlayer (data) {
 
 function playUpdate () {
   if (player.health <= 0) {
-    game.camera.x = 0;
-    game.camera.y = 0;
+    game.camera.x = 400;
+    game.camera.y = 300;
+    playState.shutdown();
     game.state.start('menu');
   }
   var attacking = false;
   for (var i = 0; i < enemies.length; i++) {
-    if (enemies[i].alive) {
+    if (enemies[i].player.alive) {
       enemies[i].update()
     } else {
       enemies[i].player.kill();
