@@ -327,8 +327,7 @@ function onRemovePlayer (data) {
 
 function playUpdate () {
   if (player.health <= 0) {
-    game.camera.x = 100;
-    game.camera.y = 200;
+    game.camera.focusOnXY(0, 0)
     game.state.start('menu');
   }
   var attacking = false;
