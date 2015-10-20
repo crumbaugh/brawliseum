@@ -386,7 +386,8 @@ function playUpdate () {
   scores.push(player.hitcount);
   scores.sort(function(a,b) { return a - b; }).reverse();
 
-  scoreBoard.setText('Top Players:\n1. ' + scores[0] + '\n2.' + scores[1] + '\n3.' + scores[2]);
+  scoreBoard.setText('Most Hits:\n1. ' + scores[0] + '\n2. ' + scores[1] + '\n3. ' + scores[2]
+                    +'\n\n\n\n\n\n\n\n\n\n\nYour Hits: ' + player.hitcount);
 
   oldPlayerRotation = player.rotation;
 
