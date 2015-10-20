@@ -3,7 +3,7 @@
 var playState = { preload: playPreload, create: playCreate, update: playUpdate, render: playRender };
 
 function playPreload () {
-  game.load.image('earth', 'assets/light_sand.png')
+  game.load.image('earth', stageselected)
   game.load.image('dude', 'assets/blue.png')
   game.load.image('enemy', 'assets/red.png')
   game.load.image('sword', 'assets/sword.png')
@@ -62,6 +62,7 @@ function playCreate () {
   player.anchor.setTo(0.5, 0.5)
   player.currAttack = 0;
   player.attackFrame = 0;
+  player.hitcount = 0;
   player.speed = 3;
   player.sword = game.add.sprite(startX + minDistance, startY, 'sword')
   player.sword.scale.setTo(.33,.33);
@@ -84,7 +85,6 @@ function playCreate () {
   player.healthbar.crop.width = (player.health / player.maxHealth) * player.healthbar.width;
 
   // This will force it to decelerate and limit its speed
-  // player.body.drag.setTo(200, 200)
   player.body.maxVelocity.setTo(400, 400)
   player.body.collideWorldBounds = true
 
@@ -105,9 +105,6 @@ function playCreate () {
   twokey = game.input.keyboard.addKey(Phaser.Keyboard.TWO);
   threekey = game.input.keyboard.addKey(Phaser.Keyboard.THREE);
   spacekey = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
-
-  // var barConfig = {x: 200, y: 100};
-  // var myHealthBar = new HealthBar(game, barConfig);
 
   // Start listening for events
   setEventHandlers()
@@ -171,6 +168,7 @@ function onMovePlayer (data) {
   movePlayer.player.healthbar.x = data.x - 35;
   movePlayer.player.healthbar.y = data.y - 50;
   movePlayer.player.health = data.h;
+  movePlayer.player.hitcount = data.hits;
 
   if (data.attack) {
     var boundsA = movePlayer.player.sword.bounds;
@@ -178,7 +176,6 @@ function onMovePlayer (data) {
     if (Phaser.Rectangle.intersects(boundsA, boundsB)) {
       player.health-=1;
     }
-
   }
 
 }
@@ -290,23 +287,6 @@ function attack(thisPlayer) {
     thisPlayer.attackFrame++;
 }
 
-// TODO for tomorrow: THIS.
-// function checkCollisions(){
-//     if ((player.currAttack > 0 || enemy.currAttack > 0) //if someone is attacking 
-//          && player.currAttack != 6 && enemy.currAttack != 6 && player.currAttack != -1 && enemy.currAttack != -1 //and neither is already in knockback
-//          && checkOverlap(player.sword, enemy.sword)) { //and the swords are touching
-//             collide(player.sword, enemy.sword);    
-//     }
-//     if (player.currAttack > 0 && checkOverlap(player.sword, enemy) && player.attacks[player.currAttack].hitboxes[player.attackFrame] != 0 && !enemy.hit) {
-//         enemy.hit = 1;
-//         var damage = game.add.text(enemy.position.x + 30*(Math.random()-.5), enemy.position.y + 30*(Math.random()-.5),
-//                                    player.attacks[player.currAttack].hitboxes[player.attackFrame]);
-//         game.add.tween(damage).to({alpha: 0}, 1000, Phaser.Easing.Linear.None, true);
-//         enemy.health -= player.attacks[player.currAttack].hitboxes[player.attackFrame];
-//         enemy.healthText.text = 'Enemy health: ' + enemy.health;
-//     } 
-// }
-
 // Remove player
 function onRemovePlayer (data) {
   var removePlayer = playerById(data.id)
@@ -327,13 +307,11 @@ function onRemovePlayer (data) {
 
 function playUpdate () {
   if (player.health <= 0) {
-    game.camera.x = 400;
-    game.camera.y = 300;
     game.state.start('menu');
   }
   var attacking = false;
   for (var i = 0; i < enemies.length; i++) {
-    if (enemies[i].player.alive) {
+    if (enemies[i].player.health > 0) {
       enemies[i].update()
     } else {
       enemies[i].player.kill();
@@ -384,6 +362,13 @@ function playUpdate () {
 
   for (var i = 0; i < enemies.length; i++) {
       enemies[i].player.healthbar.scale.setTo(.75 * (enemies[i].player.health / enemies[i].player.maxHealth), .75);
+      if (player.currAttack != 0) {
+          var boundsA = player.sword.bounds;
+          var boundsB = enemies[i].player.bounds;
+          if (Phaser.Rectangle.intersects(boundsA, boundsB)) {
+            player.hitcount++;
+          }
+      }
   }
 
   land.tilePosition.x = -game.camera.x
@@ -391,7 +376,22 @@ function playUpdate () {
   
   scoreBoard.x = game.camera.x + 10;
   scoreBoard.y = game.camera.y + 10;
-  scoreBoard.setText('Top Players:\n1. ' + leaderboard[0][0] + '\n2.' + leaderboard[1][0] + '\n3.' + leaderboard[2][0]);
+
+  var scores = [];
+  for (var i = 0; i < enemies.length; i++) {
+    scores.push(enemies[i].player.hitcount);
+  }
+  scores.push(player.hitcount);
+  scores.sort(function(a,b) { return a - b; }).reverse();
+
+  for (var i = 0; i < 3; i++) {
+    if (scores[i] == undefined) {
+      scores[i] = 0;
+    }
+  }
+
+  scoreBoard.setText('Most Damage:\n1. ' + scores[0] + '\n2. ' + scores[1] + '\n3. ' + scores[2]
+                    +'\n\n\n\n\n\n\n\n\n\n\n\n\n\nDamage Dealt: ' + player.hitcount);
 
   oldPlayerRotation = player.rotation;
 
@@ -402,7 +402,7 @@ function playUpdate () {
 
   player.sword.rotation = -3.14/2 + game.math.angleBetween(player.sword.x, player.sword.y, player.x, player.y);
 
-  socket.emit('move player', { x: player.x, y: player.y, r: player.rotation, sx: player.sword.x, sy: player.sword.y, sr: player.sword.rotation, attack: attacking, h: player.health })
+  socket.emit('move player', { x: player.x, y: player.y, r: player.rotation, sx: player.sword.x, sy: player.sword.y, sr: player.sword.rotation, attack: attacking, h: player.health, hits: player.hitcount })
 }
 
 function playRender () {
