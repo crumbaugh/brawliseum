@@ -20,6 +20,8 @@ var land;
 var music; // audio
 var swing_effect;
 
+var k = 0;
+
 var returnTime = 8;
 var blockTime = 8;
 
