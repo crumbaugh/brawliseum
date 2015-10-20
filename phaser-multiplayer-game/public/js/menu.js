@@ -13,7 +13,7 @@ function menuPreload () {
 
 function menuCreate () {
     selected = 0;
-    var background = game.add.sprite(0,0,'background');
+    var background = game.add.sprite(boundsX/2, boundsY/2, 'background');
     var stagesJSON = JSON.parse(game.cache.getText('stageslist'));
     var play_button = new myButton(game, 'button1', boundsX/2, boundsY/4, 200, 200, 'Play Game');
     var description_window = new myButton(game, 'frame', boundsX/2, boundsY*3/4, boundsX*3/4, 200, 'Select a background.');
