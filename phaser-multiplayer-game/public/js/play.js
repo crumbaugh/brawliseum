@@ -307,8 +307,6 @@ function onRemovePlayer (data) {
 
 function playUpdate () {
   if (player.health <= 0) {
-    player.x = 0;
-    player.y = 0;
     game.state.start('menu');
   }
   var attacking = false;
@@ -387,7 +385,7 @@ function playUpdate () {
   scores.sort(function(a,b) { return a - b; }).reverse();
 
   scoreBoard.setText('Most Hits:\n1. ' + scores[0] + '\n2. ' + scores[1] + '\n3. ' + scores[2]
-                    +'\n\n\n\n\n\n\n\n\n\n\nYour Hits: ' + player.hitcount);
+                    +'\n\n\n\n\n\n\n\n\n\n\n\n\n\nYour Hits: ' + player.hitcount);
 
   oldPlayerRotation = player.rotation;
 
