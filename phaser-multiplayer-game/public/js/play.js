@@ -179,7 +179,7 @@ function onMovePlayer (data) {
     console.log(player.x, movePlayer.player.x);
     if (Phaser.Rectangle.intersects(boundsA, boundsB)) {
       console.log("ONE");
-      player.health-=1;
+      movePlayer.player.health-=1;
 
     } else {
       console.log("TWO");
