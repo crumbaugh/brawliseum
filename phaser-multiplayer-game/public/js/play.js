@@ -333,7 +333,7 @@ function playUpdate () {
   }
   var attacking = false;
   for (var i = 0; i < enemies.length; i++) {
-    if (enemies[i].player.alive) {
+    if (enemies[i].player.health > 0) {
       enemies[i].update()
     } else {
       enemies[i].player.kill();
