@@ -329,7 +329,6 @@ function playUpdate () {
   if (player.health <= 0) {
     game.camera.x = 400;
     game.camera.y = 300;
-    playState.shutdown();
     game.state.start('menu');
   }
   var attacking = false;
