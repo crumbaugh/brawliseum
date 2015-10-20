@@ -171,18 +171,14 @@ function onMovePlayer (data) {
   movePlayer.player.healthbar.x = data.x - 35;
   movePlayer.player.healthbar.y = data.y - 50;
   movePlayer.player.health = data.h;
+  movePlayer.healthbar.crop.width = (movePlayer.health / movePlayer.maxHealth) * movePlayer.healthbar.width;
 
   if (data.attack) {
     var boundsA = movePlayer.player.sword.bounds;
     var boundsB = player.bounds;
-    console.log(player.health, movePlayer.player.health);
-    console.log(player.x, movePlayer.player.x);
     if (Phaser.Rectangle.intersects(boundsA, boundsB)) {
-      console.log("ONE");
-      movePlayer.player.health-=1;
-
-    } else {
-      console.log("TWO");
+      player.health-=1;
+      player.healthbar.crop.width = (player.health / player.maxHealth) * player.healthbar.width;
     }
   }
 
