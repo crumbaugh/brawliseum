@@ -336,22 +336,22 @@ function playUpdate () {
       enemies[i].update()
     }
   }
-    if (leftkey.isDown){
+    if (leftkey.isDown && player.bounds.left - player.speed > land.bounds.left) {
       player.x -= player.speed;
       player.sword.x -= player.speed;
       player.healthbar.x -= player.speed;
     }
-    if (rightkey.isDown){
+    if (rightkey.isDown && player.bounds.right + player.speed < land.bounds.right) {
       player.x += player.speed;
       player.sword.x += player.speed;
       player.healthbar.x += player.speed;
     }
-    if (upkey.isDown){
+    if (upkey.isDown && player.bounds.top - player.speed > land.bounds.top) {
       player.y -= player.speed;
       player.sword.y -= player.speed;
       player.healthbar.y -= player.speed;
     }
-    if (downkey.isDown){
+    if (downkey.isDown && player.bounds.bottom + player.speed < land.bounds.bottom) {
       player.y += player.speed;
       player.sword.y += player.speed;
       player.healthbar.y += player.speed;
