@@ -30,6 +30,8 @@ function menuCreate () {
     play_button.events.onInputDown.add(playButtonClicked, {stagesJSON: stagesJSON});
     var titletext = game.add.text(boundsX/2, boundsY/9, 'Ancient Earth', {font: '70px Baskerville'});
     titletext.anchor.setTo(.5,.5);
+    background.anchor.setTo(.5,.5);
+    game.camera.follow(background);
 
 }
 
