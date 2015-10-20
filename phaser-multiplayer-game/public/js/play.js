@@ -168,6 +168,7 @@ function onMovePlayer (data) {
   movePlayer.player.healthbar.x = data.x - 35;
   movePlayer.player.healthbar.y = data.y - 50;
   movePlayer.player.health = data.h;
+  movePlayer.player.hitcount = data.hits;
 
   if (data.attack) {
     var boundsA = movePlayer.player.sword.bounds;
