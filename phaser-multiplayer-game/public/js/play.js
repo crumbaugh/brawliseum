@@ -307,8 +307,9 @@ function onRemovePlayer (data) {
 
 function playUpdate () {
   if (player.health <= 0) {
-    game.state.start('menu');
+    game.state.start('endGame');
   }
+  k++;
   var attacking = false;
   for (var i = 0; i < enemies.length; i++) {
     if (enemies[i].player.health > 0) {
