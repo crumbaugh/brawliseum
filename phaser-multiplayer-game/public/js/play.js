@@ -170,6 +170,8 @@ function onMovePlayer (data) {
   movePlayer.player.sword.rotation = data.sr
   movePlayer.player.healthbar.x = data.x - 35;
   movePlayer.player.healthbar.y = data.y - 50;
+  movePlayer.player.health = data.h;
+  movePlayer.healthbar.crop.width = (movePlayer.health / movePlayer.maxHealth) * movePlayer.healthbar.width;
 
   if (data.attack) {
     var boundsA = movePlayer.player.sword.bounds;
@@ -386,7 +388,9 @@ function playUpdate () {
 
   player.sword.rotation = -3.14/2 + game.math.angleBetween(player.sword.x, player.sword.y, player.x, player.y);
 
-  socket.emit('move player', { x: player.x, y: player.y, r: player.rotation, sx: player.sword.x, sy: player.sword.y, sr: player.sword.rotation, attack: attacking })
+  player.healthbar.crop.width = (player.health / player.maxHealth) * player.healthbar.width;
+
+  socket.emit('move player', { x: player.x, y: player.y, r: player.rotation, sx: player.sword.x, sy: player.sword.y, sr: player.sword.rotation, attack: attacking, h: player.health })
 }
 
 function playRender () {
