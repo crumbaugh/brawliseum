@@ -2,22 +2,22 @@
         {
            "name": "Desert",
            "description": "Hot!",
-           "image": "N/A"
+           "image": "assets/light_sand.png"
        },
        {
-            "name": "Tundra",
-            "description": "Brr!",
-            "image": "N/A"
+            "name": "Grass",
+            "description": "Grassy?",
+            "image": "assets/light_grass.png"
         },
         {
-            "name": "Ocean",
-            "description": "Glug.",
-            "image": "N/A"
+            "name": "Ice",
+            "description": "Not Hot!",
+            "image": "assets/ice.png"
         },
         {
-            "name": "Road",
-            "description": "Yeehaw!",
-            "image": "N/A"
+            "name": "Earth",
+            "description": "Hardcore",
+            "image": "assets/scorched_earth.png"
         }
     ]
 }
