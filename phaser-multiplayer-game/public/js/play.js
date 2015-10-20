@@ -171,7 +171,7 @@ function onMovePlayer (data) {
   movePlayer.player.healthbar.x = data.x - 35;
   movePlayer.player.healthbar.y = data.y - 50;
   movePlayer.player.health = data.h;
-  movePlayer.healthbar.crop.width = (movePlayer.health / movePlayer.maxHealth) * movePlayer.healthbar.width;
+  movePlayer.player.healthbar.crop.width = (movePlayer.player.health / movePlayer.player.maxHealth) * movePlayer.player.healthbar.width;
 
   if (data.attack) {
     var boundsA = movePlayer.player.sword.bounds;
