@@ -78,10 +78,10 @@ function playCreate () {
   player.health = 1000;
   player.maxHealth = 1000;
 
-  player.localhealthbar = this.game.add.sprite(startX - 35, startY - 50,'healthbar');
-  player.localhealthbar.cropEnabled = true;
-  player.localhealthbar.scale.setTo(.75,.75);
-  player.localhealthbar.crop.width = (player.health / player.maxHealth) * player.localhealthbar.width;
+  player.healthbar = game.add.sprite(startX - 35, startY - 50,'healthbar');
+  player.healthbar.cropEnabled = true;
+  player.healthbar.scale.setTo(.75,.75);
+  player.healthbar.crop.width = (player.health / player.maxHealth) * player.healthbar.width;
 
   // This will force it to decelerate and limit its speed
   // player.body.drag.setTo(200, 200)
@@ -339,22 +339,22 @@ function playUpdate () {
     if (leftkey.isDown && player.bounds.left - player.speed > land.bounds.left) {
       player.x -= player.speed;
       player.sword.x -= player.speed;
-      player.localhealthbar.x -= player.speed;
+      player.healthbar.x -= player.speed;
     }
     if (rightkey.isDown && player.bounds.right + player.speed < land.bounds.right) {
       player.x += player.speed;
       player.sword.x += player.speed;
-      player.localhealthbar.x += player.speed;
+      player.healthbar.x += player.speed;
     }
     if (upkey.isDown && player.bounds.top - player.speed > land.bounds.top) {
       player.y -= player.speed;
       player.sword.y -= player.speed;
-      player.localhealthbar.y -= player.speed;
+      player.healthbar.y -= player.speed;
     }
     if (downkey.isDown && player.bounds.bottom + player.speed < land.bounds.bottom) {
       player.y += player.speed;
       player.sword.y += player.speed;
-      player.localhealthbar.y += player.speed;
+      player.healthbar.y += player.speed;
     }
     if (onekey.isDown){
       preferredAttack = 1;
@@ -375,7 +375,7 @@ function playUpdate () {
       attacking = true;
     }
 
-  player.localhealthbar.crop.width = (player.health / player.maxHealth) * player.localhealthbar.width;
+  player.healthbar.crop.width = (player.health / player.maxHealth) * player.healthbar.width;
 
   land.tilePosition.x = -game.camera.x
   land.tilePosition.y = -game.camera.y
