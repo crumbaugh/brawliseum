@@ -178,7 +178,7 @@ function onMovePlayer (data) {
     var boundsB = player.bounds;
     if (Phaser.Rectangle.intersects(boundsA, boundsB)) {
       console.log("ONE");
-      // player.health-=1;
+      player.health-=1;
       // player.healthbar.crop.width = (player.health / player.maxHealth) * player.healthbar.width;
     } else {
       console.log("TWO");
