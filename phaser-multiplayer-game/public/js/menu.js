@@ -28,6 +28,7 @@ function menuCreate () {
             (stageButtonHovered, {i: i, text: description_window.buttontext, stagesJSON: stagesJSON});
         stagebuttons[i].events.onInputOut.add(stageButtonCleared, description_window.buttontext);
     }
+    background.anchor.setTo(.5, .5);
     game.camera.follow(background)
 }
 
