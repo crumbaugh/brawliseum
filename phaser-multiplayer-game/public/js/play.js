@@ -84,7 +84,6 @@ function playCreate () {
   player.healthbar.crop.width = (player.health / player.maxHealth) * player.healthbar.width;
 
   // This will force it to decelerate and limit its speed
-  // player.body.drag.setTo(200, 200)
   player.body.maxVelocity.setTo(400, 400)
   player.body.collideWorldBounds = true
 
@@ -105,9 +104,6 @@ function playCreate () {
   twokey = game.input.keyboard.addKey(Phaser.Keyboard.TWO);
   threekey = game.input.keyboard.addKey(Phaser.Keyboard.THREE);
   spacekey = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
-
-  // var barConfig = {x: 200, y: 100};
-  // var myHealthBar = new HealthBar(game, barConfig);
 
   // Start listening for events
   setEventHandlers()
@@ -177,6 +173,7 @@ function onMovePlayer (data) {
     var boundsB = player.bounds;
     if (Phaser.Rectangle.intersects(boundsA, boundsB)) {
       player.health-=1;
+      movePlayer.player.hitcount++;
     }
 
   }
@@ -290,23 +287,6 @@ function attack(thisPlayer) {
     thisPlayer.attackFrame++;
 }
 
-// TODO for tomorrow: THIS.
-// function checkCollisions(){
-//     if ((player.currAttack > 0 || enemy.currAttack > 0) //if someone is attacking 
-//          && player.currAttack != 6 && enemy.currAttack != 6 && player.currAttack != -1 && enemy.currAttack != -1 //and neither is already in knockback
-//          && checkOverlap(player.sword, enemy.sword)) { //and the swords are touching
-//             collide(player.sword, enemy.sword);    
-//     }
-//     if (player.currAttack > 0 && checkOverlap(player.sword, enemy) && player.attacks[player.currAttack].hitboxes[player.attackFrame] != 0 && !enemy.hit) {
-//         enemy.hit = 1;
-//         var damage = game.add.text(enemy.position.x + 30*(Math.random()-.5), enemy.position.y + 30*(Math.random()-.5),
-//                                    player.attacks[player.currAttack].hitboxes[player.attackFrame]);
-//         game.add.tween(damage).to({alpha: 0}, 1000, Phaser.Easing.Linear.None, true);
-//         enemy.health -= player.attacks[player.currAttack].hitboxes[player.attackFrame];
-//         enemy.healthText.text = 'Enemy health: ' + enemy.health;
-//     } 
-// }
-
 // Remove player
 function onRemovePlayer (data) {
   var removePlayer = playerById(data.id)
@@ -327,7 +307,8 @@ function onRemovePlayer (data) {
 
 function playUpdate () {
   if (player.health <= 0) {
-    game.camera.focusOnXY(0, 0)
+    player.x = 0;
+    player.y = 0;
     game.state.start('menu');
   }
   var attacking = false;
@@ -390,7 +371,14 @@ function playUpdate () {
   
   scoreBoard.x = game.camera.x + 10;
   scoreBoard.y = game.camera.y + 10;
-  scoreBoard.setText('Top Players:\n1. ' + leaderboard[0][0] + '\n2.' + leaderboard[1][0] + '\n3.' + leaderboard[2][0]);
+
+  var scores = [];
+  for (var i = 0; i < enemies.length; i++) {
+    scores.append(enemies[i].player.hitcount);
+  }
+  scores.sort(function(a,b) { return a - b; });
+
+  scoreBoard.setText('Top Players:\n1. ' + scores[0] + '\n2.' + scores[1] + '\n3.' + scores[2]);
 
   oldPlayerRotation = player.rotation;
 
