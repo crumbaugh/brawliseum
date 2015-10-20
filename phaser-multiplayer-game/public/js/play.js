@@ -327,13 +327,18 @@ function onRemovePlayer (data) {
 
 function playUpdate () {
   if (player.health <= 0) {
-    socket.emit('remove player', { id: player.name });
+    camera.x = 0;
+    camera.y = 0;
     game.state.start('menu');
   }
   var attacking = false;
   for (var i = 0; i < enemies.length; i++) {
     if (enemies[i].alive) {
       enemies[i].update()
+    } else {
+      enemies[i].player.kill();
+      enemies[i].player.sword.kill()
+      enemies[i].player.healthbar.kill()
     }
   }
     if (leftkey.isDown && player.bounds.left - player.speed > land.bounds.left) {
