@@ -171,7 +171,6 @@ function onMovePlayer (data) {
   movePlayer.player.healthbar.x = data.x - 35;
   movePlayer.player.healthbar.y = data.y - 50;
   movePlayer.player.health = data.h;
-  movePlayer.player.healthbar.crop.width = (movePlayer.player.health / movePlayer.player.maxHealth) * movePlayer.player.healthbar.width;
 
   if (data.attack) {
     var boundsA = movePlayer.player.sword.bounds;
@@ -180,7 +179,6 @@ function onMovePlayer (data) {
       console.log(player.health);
       console.log(movePlayer.player.health);
       player.health-=1;
-      player.healthbar.crop.width = (player.health / player.maxHealth) * player.healthbar.width;
       console.log(player.health);
       console.log(movePlayer.player.health);
     }
@@ -376,6 +374,15 @@ function playUpdate () {
       attack(player);
       attacking = true;
     }
+
+  player.healthbar.crop.width = (player.health / player.maxHealth) * player.healthbar.width;
+
+  for (var i = 0; i < enemies.length; i++) {
+    if (enemies[i].alive) {
+      var n_m_e = enemies[i].player;
+      n_m_e.healthbar.crop.width = (n_m_e.health / n_m_e.maxHealth) * n_m_e.healthbar.width;
+    }
+  }
 
   land.tilePosition.x = -game.camera.x
   land.tilePosition.y = -game.camera.y
