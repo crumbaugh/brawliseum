@@ -1,4 +1,5 @@
 
+
 myButton.prototype = Object.create(Phaser.Sprite.prototype);
 //myPanel.prototype = Object.create(Phaser.Sprite.prototype);
 
@@ -23,6 +24,7 @@ function myButton(game, image, x, y, width, height, text) {
 
 function stageButtonClicked () {
     selected = this;
+    console.log("Stage number: "+ selected)
 }
 
 function stageButtonHovered () {
@@ -36,7 +38,7 @@ function stageButtonCleared () {
 
 
 function playButtonClicked () {
-    selected = this;
+    stageselected = this.stagesJSON.stages[selected].image;
     game.state.start('play');
 }
 
@@ -48,3 +50,5 @@ myButton.prototype.update = function() {
         this.buttontext.setStyle({fill: 'black'});
     }
 }
+
+

@@ -1,6 +1,7 @@
 var menuState = {preload: menuPreload, create: menuCreate, update: menuUpdate};
 
 var selected;
+var stageselected;
 var stagebuttons = [];
 
 function menuPreload () {
@@ -17,19 +18,19 @@ function menuCreate () {
     var stagesJSON = JSON.parse(game.cache.getText('stageslist'));
     var play_button = new myButton(game, 'button1', boundsX/2, boundsY/4, 200, 200, 'Play Game');
     var description_window = new myButton(game, 'frame', boundsX/2, boundsY*3/4, boundsX*3/4, 200, 'Select a background.');
-    play_button.events.onInputDown.add(playButtonClicked, stagesJSON.stages[selected]);
-  //  var stagebuttons = [];
+
     for (i = 0; i < 4; i++) {
         stagebuttons[i] = new myButton(game, 'button1', boundsX*(2*i+1)/8,
             boundsY/2, 150, 150, stagesJSON.stages[i].name);
-        console.log(stagesJSON.stages[i].name);
         stagebuttons[i].events.onInputDown.add(stageButtonClicked, i);
         stagebuttons[i].events.onInputOver.add
             (stageButtonHovered, {i: i, text: description_window.buttontext, stagesJSON: stagesJSON});
         stagebuttons[i].events.onInputOut.add(stageButtonCleared, description_window.buttontext);
     }
-    background.anchor.setTo(.5, .5);
-    game.camera.follow(background)
+    play_button.events.onInputDown.add(playButtonClicked, {stagesJSON: stagesJSON});
+    var titletext = game.add.text(boundsX/2, boundsY/9, 'Ancient Earth', {font: '70px Baskerville'});
+    titletext.anchor.setTo(.5,.5);
+
 }
 
 function menuUpdate () {
