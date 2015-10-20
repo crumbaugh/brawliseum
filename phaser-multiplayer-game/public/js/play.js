@@ -384,8 +384,14 @@ function playUpdate () {
   scores.push(player.hitcount);
   scores.sort(function(a,b) { return a - b; }).reverse();
 
-  scoreBoard.setText('Most Hits:\n1. ' + scores[0] + '\n2. ' + scores[1] + '\n3. ' + scores[2]
-                    +'\n\n\n\n\n\n\n\n\n\n\n\n\n\nYour Hits: ' + player.hitcount);
+  for (var i = 0; i < 3; i++) {
+    if (scores[i] == undefined) {
+      scores[i] = 0;
+    }
+  }
+
+  scoreBoard.setText('Most Damage:\n1. ' + scores[0] + '\n2. ' + scores[1] + '\n3. ' + scores[2]
+                    +'\n\n\n\n\n\n\n\n\n\n\n\n\n\nDamage Dealt: ' + player.hitcount);
 
   oldPlayerRotation = player.rotation;
 
