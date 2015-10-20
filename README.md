@@ -10,4 +10,4 @@
 
 * Music modified from http://opengameart.org/content/battle-theme-0
 
-* Play with us at ancient-earth-4668.herokuapp.com
+* Play with us at http://ancient-earth-4668.herokuapp.com
