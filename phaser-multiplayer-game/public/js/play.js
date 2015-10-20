@@ -388,8 +388,6 @@ function playUpdate () {
 
   player.sword.rotation = -3.14/2 + game.math.angleBetween(player.sword.x, player.sword.y, player.x, player.y);
 
-  player.healthbar.crop.width = (player.health / player.maxHealth) * player.healthbar.width;
-
   socket.emit('move player', { x: player.x, y: player.y, r: player.rotation, sx: player.sword.x, sy: player.sword.y, sr: player.sword.rotation, attack: attacking, h: player.health })
 }
 
