@@ -374,7 +374,7 @@ function playUpdate () {
 
   var scores = [];
   for (var i = 0; i < enemies.length; i++) {
-    scores.append(enemies[i].player.hitcount);
+    scores.push(enemies[i].player.hitcount);
   }
   scores.sort(function(a,b) { return a - b; });
 
